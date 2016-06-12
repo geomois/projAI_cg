@@ -65,6 +65,7 @@ def downSample(waves,rate):
     resampledSignals=[]
     resampledRates=[]
     for i in range(0,len(waves)):
+	print 'original wave: ',len(waves[i])
         newRate=(rate*percentage)/100
         resampledSignals.append(np.asarray(signal.resample(waves[i],(len(waves[i])/rate)*newRate)))
         resampledRates.append(newRate)
@@ -74,8 +75,8 @@ def downSample(waves,rate):
 if __name__ == '__main__':
 #    waves,rate,paths=prepareAudio(sys.argv[1])
 #    annotations=prepareAnnotation(sys.argv[2])
-    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
-    annotations=prepareAnnotation("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
+    waves,rate,paths=prepareAudio("/home/gms590/projAI/projAI_cg/Annotated_music/train/")
+    annotations=prepareAnnotation("/home/gms590/projAI/projAI_cg/Annotated_music/jamendo_lab/",paths)
     signals,downRate=downSample(waves,rate)
 #TODO: kalw model
     m=kerasModel(signals,downRate,annotations)
