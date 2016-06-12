@@ -1,15 +1,32 @@
 import keras
+import numpy as np
 
-
-class kerasModel():
-    def __init__(self,waves,rate):
+class kerasModel:
+    def __init__(self,waves,rate,annotations):
         self.data = []
-#        self.signals=signal.resample(waves,rate)
+        self.signals=waves
         self.rate=rate
-
+        self.annotations=annotations
+        
+#    def prepareTrainData(aWaves,rate):
+        
+    def prepareAnnotations(self):
+        annotations=self.annotations
+        aWaves=[]
+        for wave in self.signals:
+            aWaveTemp=np.zeros((1,len(wave)))
+            for i in range(0,len(annotations)):
+                for j in range(0,len(annotations[i])):
+                    if(annotations[i][j][2]): # True -> sing -> 1
+                        start=np.ceil(self.rate[i]*annotations[i][j][0])
+                        end=np.floor(self.rate[i]*annotations[i][j][1])
+                        aWaveTemp[0][start:end]=[1 for k in range(int(start),int(end))]
+            aWaves.append(aWaveTemp[0])
+        print aWaves[0].shape
+        
     def buildModel(self,train):
         model = keras.Sequential()
-        model.add(keras.Convolution1D(32, 32, border_mode='same', activation="tanh", input_shape=(self.rate, 1)))
+        model.add(keras.Convolution1D(32, 32, border_mode='same', activation="tanh", input_shape=(9, 1)))
         model.add(keras.AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
         model.add(keras.Convolution1D(32, 32, border_mode='same', activation="tanh"))
         model.add(keras.AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
