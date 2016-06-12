@@ -15,14 +15,14 @@ class kerasModel:
         aWaves=[]
         for wave in self.signals:
             aWaveTemp=np.zeros((1,len(wave)))
-            for i in range(0,len(annotations)):
+            for i in range(0,len(self.rate)):
                 for j in range(0,len(annotations[i])):
                     if(annotations[i][j][2]): # True -> sing -> 1
                         start=np.ceil(self.rate[i]*annotations[i][j][0])
                         end=np.floor(self.rate[i]*annotations[i][j][1])
                         aWaveTemp[0][start:end]=[1 for k in range(int(start),int(end))]
             aWaves.append(aWaveTemp[0])
-        print aWaves[0].shape
+#        print aWaves[0].shape
         
     def buildModel(self,train):
         model = keras.Sequential()
