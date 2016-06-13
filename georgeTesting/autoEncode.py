@@ -2,8 +2,9 @@ import numpy as np
 import soundfile as sf
 import os
 import sys
-from model import kerasModel
+#from model import kerasModel
 import scipy.signal as signal
+import pickle
 
 def prepareAudio(directory):
     oggs=[]
@@ -34,7 +35,7 @@ def prepareAudio(directory):
 
     return trainWaves,trainRate,oggs
 
-def prepareAnnotation(directory,audioPaths):
+def readAnnotations(directory,audioPaths):
     fileNames=[]
     for path in audioPaths:
         fileNames.append(os.path.basename(path).split('.')[0])
@@ -68,15 +69,57 @@ def downSample(waves,rate):
         newRate=(rate*percentage)/100
         resampledSignals.append(np.asarray(signal.resample(waves[i],(len(waves[i])/rate)*newRate)))
         resampledRates.append(newRate)
-        
+    
     return resampledSignals,resampledRates
 
+    
+def prepareAnnotations(signals,rate,annotations):
+    aWaves=[]
+    for wave in signals:
+        aWaveTemp=np.zeros((1,len(wave)))
+        for i in range(0,len(rate)):
+            for j in range(0,len(annotations[i])):
+                if(annotations[i][j][2]): # True -> sing -> 1
+                    start=np.ceil(rate[i]*annotations[i][j][0])
+                    end=np.floor(rate[i]*annotations[i][j][1])
+                    aWaveTemp[0][start:end]=[1 for k in range(int(start),int(end))]
+        aWaves.append(aWaveTemp[0])
+    
+    return aWaves
+
+def toPickle(writeFlag,waves=None,rates=None,annotation=None):
+    if writeFlag:
+        pickle.dump(annotation,open('pickled/annot.pi','wb'))
+        pickle.dump(waves,open('pickled/wav.pi','wb'))
+        pickle.dump(rates,open('pickled/rates.pi','wb'))
+    else:
+        waves= pickle.load(open("pickled/wav.pi","rb"))
+        annotation=pickle.load(open('pickled/annot.pi','rb'))
+        rates=pickle.load(open('pickled/rates.pi','rb'))
+        return waves,annotation,rates        
+        
 if __name__ == '__main__':
-#    waves,rate,paths=prepareAudio(sys.argv[1])
-#    annotations=prepareAnnotation(sys.argv[2])
-    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
-    annotations=prepareAnnotation("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
-    signals,downRate=downSample(waves,rate)
-#TODO: kalw model
-    m=kerasModel(signals,downRate,annotations)
-    m.prepareAnnotations()
+    simpleRun=False
+    if sys.argv[3] =='read':
+        waves,annotation,rates = toPickle(False)
+    elif sys.argv[3] =='write':
+        waves,rate,paths=prepareAudio(sys.argv[1])
+        annotations=readAnnotations(sys.argv[2],paths)
+        signals,downRate=downSample(waves,rate)
+        annotationWave=prepareAnnotations(signals,downRate,annotations) 
+        toPickle(True,signals,downRate,annotationWave)
+     else:
+         simpleRun=True
+         
+     if simpleRun:
+        waves,rate,paths=prepareAudio(sys.argv[1])
+        annotations=readAnnotations(sys.argv[2],paths)
+        signals,downRate=downSample(waves,rate)
+        annotationWave=prepareAnnotations(signals,downRate,annotations)
+#    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
+#    annotations=prepareAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
+#    signals,downRate=downSample(waves,rate)
+#    annotationWave=prepareAnnotations(signals,downRate,annotations)
+     
+##TODO: kalw model
+#    m=kerasModel(signals,downRate,annotations)
