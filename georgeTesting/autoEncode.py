@@ -19,9 +19,9 @@ def prepareAudio(directory):
     
     oggs=sorted(oggs)
     trainWaves=[]
-#    trainRates=[]
+    trainRates=[]
     trainRate=0
-    stop=3
+    stop=2
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
@@ -29,25 +29,28 @@ def prepareAudio(directory):
             trainWaves.append(audioTemp)
             trainRate=rateTemp
             count+=1
+	    trainRates.append(rateTemp)
             if count==stop:
                 break
-#            trainRates.append(rateTemp)
             # In case we want to save the wave files, uncomment the following line
             # sf.write(os.path.dirname(path)+"/"+os.path.basename(path).split('.')[0]+'.wav',audioTemp,rateTemp)
-
-    return trainWaves,trainRate,oggs
+    return trainWaves,trainRates,oggs
 
 def readAnnotations(directory,audioPaths):
     fileNames=[]
-    for path in audioPaths:
-        fileNames.append(os.path.basename(path).split('.')[0])
-        
     timings=[]
-    for subdir, dirs, files in os.walk(directory):
-        for f in files:
-            if f.split('.')[0] in fileNames:
-                 timings.append(os.path.join(subdir,f))
-    timings=sorted(timings)
+    for path in audioPaths:
+        #fileNames.append(os.path.basename(path).split('.')[0])
+	timings.append(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
+	print os.path.basename(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
+        
+    #timings=[]
+    #for subdir, dirs, files in os.walk(directory):
+        #for f in files:
+            #if f.split('.')[0] in fileNames:
+                # timings.append(os.path.join(subdir,f))
+		 #print f
+#    timings=sorted(timings)
     
     annotations=[]
     for path in timings:
@@ -57,7 +60,7 @@ def readAnnotations(directory,audioPaths):
             for line in content:
                 temp=line.split(' ')
                 l.append([float(temp[0]), float(temp[1]),(True if temp[2]=='sing' else False)])
-            
+            print l
             annotations.append(np.asarray(l))
     
     return annotations
@@ -67,24 +70,29 @@ def downSample(waves,rate):
     percentage=50
     resampledSignals=[]
     resampledRates=[]
-
     for i in range(0,len(waves)):
-        newRate=(rate*percentage)/100
-        resampledSignals.append(np.asarray(signal.resample(waves[i],(len(waves[i])/rate)*newRate)))
+        newRate=(rate[i]*percentage)/100
+	temp=np.asarray(signal.resample(waves[i],(len(waves[i])/rate[i])*newRate))
+        resampledSignals.append(temp)
         resampledRates.append(newRate)
-    
+	print 'res i', temp.shape,' ',i    
     return resampledSignals,resampledRates
 
     
 def prepareAnnotations(signals,rate,annotations):
     aWaves=[]
-    for wave in signals:
-        aWaveTemp=np.zeros((1,len(wave)))
-        for i in range(0,len(rate)):
-            for j in range(0,len(annotations[i])):
-                if(annotations[i][j][2]): # True -> sing -> 1
-                    start=np.ceil(rate[i]*annotations[i][j][0])
-                    end=np.floor(rate[i]*annotations[i][j][1])
+    for k in range(0,len(signals):
+        aWaveTemp=np.zeros((1,len(signals[k])))
+        for j in range(0,len(annotations[i])):
+		 if(annotations[i][j][2]):
+			start=np.ceil(rate[i]*annotations[i][j][0])
+                        end=np.floor(rate[i]*annotations[i][j][1])
+		        print 'start ',start
+		        print 'end ',end
+		   # print 'rate ' , rate[i]
+		   # print 'annot ',annotations[i][j][1]
+		   # print aWaveTemp.shape
+        	   # print wave.shape
                     aWaveTemp[0][start:end]=[1 for k in range(int(start),int(end))]
         aWaves.append(aWaveTemp[0])
     
