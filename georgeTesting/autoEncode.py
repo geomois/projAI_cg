@@ -42,7 +42,7 @@ def readAnnotations(directory,audioPaths):
     for path in audioPaths:
         #fileNames.append(os.path.basename(path).split('.')[0])
 	timings.append(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
-	print os.path.basename(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
+#	print os.path.basename(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
         
     #timings=[]
     #for subdir, dirs, files in os.walk(directory):
@@ -83,17 +83,17 @@ def prepareAnnotations(signals,rate,annotations):
     aWaves=[]
     for k in range(0,len(signals)):
         aWaveTemp=np.zeros((1,len(signals[k])))
-        for j in range(0,len(annotations[i])):
-		 if(annotations[i][j][2]):
-			start=np.ceil(rate[i]*annotations[i][j][0])
-                        end=np.floor(rate[i]*annotations[i][j][1])
+        for j in range(0,len(annotations[k])):
+		 if(annotations[k][j][2]):
+			start=np.ceil(rate[k]*annotations[k][j][0])
+                        end=np.floor(rate[k]*annotations[k][j][1])
 #		        print 'start ',start
 #		        print 'end ',end
-		   # print 'rate ' , rate[i]
-		   # print 'annot ',annotations[i][j][1]
+		   # print 'rate ' , rate[k]
+		   # print 'annot ',annotations[k][j][1]
 		   # print aWaveTemp.shape
         	   # print wave.shape
-                        aWaveTemp[0][start:end]=[1 for k in range(int(start),int(end))]
+                        aWaveTemp[0][start:end]=[1 for u in range(int(start),int(end))]
         aWaves.append(aWaveTemp[0])
     
     return aWaves
@@ -156,8 +156,8 @@ if __name__ == '__main__':
         test=MyAudio(downRate[i],signals[i],1,annotationWave[i])
         test.split()
         inp,out=test.getInputOutputMatrices()
-        test_input_matrix.dstack(inp)
-        test_output_matrix.dstack(out)
+        np.dstack((test_input_matrix,inp))
+        np.dstack((test_output_matrix,out))
         
 ##TODO: kalw model
 #    m=kerasModel(signals,downRate,annotations)
