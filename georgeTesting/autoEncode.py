@@ -138,13 +138,18 @@ if __name__ == '__main__':
 #    annotationWave=prepareAnnotations(signals,downRate,annotations)
 #     
     #for one audio (i.e. signal in class autoEncode.py) call:
-    test=MyAudio(downRate[0],signals[0],1)
+
+    test=MyAudio(downRate[0],signals[0],1,annotationWave[0])
     test.split()
-    testmatrix=test.getInputMatrix()
+    inp,out=test.getInputMatrix()
+    test_input_matrix=inp
+    test_output_matrix=out
     for i in range(1,len(signals)):   
-        test=MyAudio(downRate[i],signals[i],1)
+        test=MyAudio(downRate[i],signals[i],1,annotationWave[i])
         test.split()
-        testmatrix.dstack(test.getInputMatrix())
+        inp,out=test.getInputMatrix()
+        test_input_matrix.dstack(inp)
+        test_output_matrix.dstack(out)
         
 ##TODO: kalw model
 #    m=kerasModel(signals,downRate,annotations)
