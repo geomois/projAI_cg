@@ -5,7 +5,7 @@ import sys
 #from model import kerasModel
 import scipy.signal as signal
 import pickle
-from toyPipeline import *
+from toyPipeline import MyAudio
 
 
 def prepareAudio(directory):
@@ -126,10 +126,11 @@ if __name__ == '__main__':
         simpleRun=True
          
     if simpleRun:
-       waves,rate,paths=prepareAudio(sys.argv[1])
-       annotations=readAnnotations(sys.argv[2],paths)
-       signals,downRate=downSample(waves,rate)
-       annotationWave=prepareAnnotations(signals,downRate,annotations)
+        print 'simpleRun'
+        waves,rate,paths=prepareAudio(sys.argv[1])
+        annotations=readAnnotations(sys.argv[2],paths)
+        signals,downRate=downSample(waves,rate)
+        annotationWave=prepareAnnotations(signals,downRate,annotations)
 
 #    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
 #    annotations=readAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
@@ -137,10 +138,13 @@ if __name__ == '__main__':
 #    annotationWave=prepareAnnotations(signals,downRate,annotations)
 #     
     #for one audio (i.e. signal in class autoEncode.py) call:
-    test=MyAudio(downRate,signals[0],1)
-    testchunks=test.split()
+    test=MyAudio(downRate[0],signals[0],1)
+    test.split()
     testmatrix=test.getInputMatrix()
-     
-     
+    for i in range(1,len(signals)):   
+        test=MyAudio(downRate[i],signals[i],1)
+        test.split()
+        testmatrix.dstack(test.getInputMatrix())
+        
 ##TODO: kalw model
 #    m=kerasModel(signals,downRate,annotations)
