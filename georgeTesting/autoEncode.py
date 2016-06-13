@@ -156,8 +156,8 @@ if __name__ == '__main__':
         test=MyAudio(downRate[i],signals[i],1,annotationWave[i])
         test.split()
         inp,out=test.getInputOutputMatrices()
-        np.dstack((test_input_matrix,inp))
-        np.dstack((test_output_matrix,out))
+        np.hstack((test_input_matrix,inp))
+        np.vstack((test_output_matrix,out))
         
 ##TODO: kalw model
 #    m=kerasModel(signals,downRate,annotations)

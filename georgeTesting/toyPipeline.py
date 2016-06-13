@@ -57,11 +57,11 @@ class MyAudio:
 		numchannels=2
 #		print "matrix_width",matrix_width
 #		print "matrix_height",matrix_height
-		self.input_matrix=np.zeros(shape=(matrix_height,matrix_width,numchannels))
+		self.input_matrix=np.zeros(shape=(numchannels,matrix_height,matrix_width))
 		self.output_matrix=np.zeros(shape=(matrix_height,matrix_width))
         	for i,chunk in enumerate(self.chunks):
-	                self.input_matrix[i,:,0]=self.chunks[i][0:matrix_width]
-			self.input_matrix[i,:,1]=self.chunks2[i][0:matrix_width]
+	                self.input_matrix[0,i,:]=self.chunks[i][0:matrix_width]
+			self.input_matrix[1,i,:]=self.chunks2[i][0:matrix_width]
        			self.output_matrix[i,:]=self.chunks3[i][0:matrix_width]
 		print"chunks[i][0:matrix_width]:",self.chunks[2][0:matrix_width].shape
 		print"matrix_width",matrix_width
