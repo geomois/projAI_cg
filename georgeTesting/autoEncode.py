@@ -107,35 +107,35 @@ def toOgg(waves,rates,paths):
         sf.write('resampled/'+ os.path.basename(paths[i]),waves[i][:,:],rates[i])
 
 if __name__ == '__main__':
-#    simpleRun=False
-#    if sys.argv[3] =='read':
-#        waves,annotation,rates = toPickle(False)
-#    elif sys.argv[3] =='write':
-#        waves,rate,paths=prepareAudio(sys.argv[1])
-#        annotations=readAnnotations(sys.argv[2],paths)
-#        signals,downRate=downSample(waves,rate)
-#        annotationWave=prepareAnnotations(signals,downRate,annotations) 
-#        toPickle(True,signals,downRate,annotationWave)
-#    elif sys.argv[3] == 'ogg':
-#        waves,rate,paths=prepareAudio(sys.argv[1])
-#        annotations=readAnnotations(sys.argv[2],paths)
-#        signals,downRate=downSample(waves,rate)
-#        annotationWave=prepareAnnotations(signals,downRate,annotations)
-#        toOgg(signals,downRate,paths)
-#    else:
-#        simpleRun=True
-#         
-#    if simpleRun:
-#       waves,rate,paths=prepareAudio(sys.argv[1])
-#       annotations=readAnnotations(sys.argv[2],paths)
-#       signals,downRate=downSample(waves,rate)
-#       annotationWave=prepareAnnotations(signals,downRate,annotations)
+    simpleRun=False
+    if sys.argv[3] =='read':
+        waves,annotation,rates = toPickle(False)
+    elif sys.argv[3] =='write':
+        waves,rate,paths=prepareAudio(sys.argv[1])
+        annotations=readAnnotations(sys.argv[2],paths)
+        signals,downRate=downSample(waves,rate)
+        annotationWave=prepareAnnotations(signals,downRate,annotations) 
+        toPickle(True,signals,downRate,annotationWave)
+    elif sys.argv[3] == 'ogg':
+        waves,rate,paths=prepareAudio(sys.argv[1])
+        annotations=readAnnotations(sys.argv[2],paths)
+        signals,downRate=downSample(waves,rate)
+        annotationWave=prepareAnnotations(signals,downRate,annotations)
+        toOgg(signals,downRate,paths)
+    else:
+        simpleRun=True
+         
+    if simpleRun:
+       waves,rate,paths=prepareAudio(sys.argv[1])
+       annotations=readAnnotations(sys.argv[2],paths)
+       signals,downRate=downSample(waves,rate)
+       annotationWave=prepareAnnotations(signals,downRate,annotations)
 
-    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
-    annotations=readAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
-    signals,downRate=downSample(waves,rate)
-    annotationWave=prepareAnnotations(signals,downRate,annotations)
-     
+#    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
+#    annotations=readAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
+#    signals,downRate=downSample(waves,rate)
+#    annotationWave=prepareAnnotations(signals,downRate,annotations)
+#     
     #for one audio (i.e. signal in class autoEncode.py) call:
     test=MyAudio(downRate,signals[0],1)
     testchunks=test.split()
