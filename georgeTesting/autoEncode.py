@@ -21,7 +21,7 @@ def prepareAudio(directory):
     trainWaves=[]
 #    trainRates=[]
     trainRate=0
-    stop=1
+    stop=3
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
@@ -141,13 +141,13 @@ if __name__ == '__main__':
 
     test=MyAudio(downRate[0],signals[0],1,annotationWave[0])
     test.split()
-    inp,out=test.getInputMatrix()
+    inp,out=test.getInputOutputMatrices()
     test_input_matrix=inp
     test_output_matrix=out
     for i in range(1,len(signals)):   
         test=MyAudio(downRate[i],signals[i],1,annotationWave[i])
         test.split()
-        inp,out=test.getInputMatrix()
+        inp,out=test.getInputOutputMatrices()
         test_input_matrix.dstack(inp)
         test_output_matrix.dstack(out)
         
