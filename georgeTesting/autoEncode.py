@@ -2,7 +2,7 @@ import numpy as np
 import soundfile as sf
 import os
 import sys
-#from model import kerasModel
+from model import kerasModel
 import scipy.signal as signal
 import pickle
 from toyPipeline import MyAudio
@@ -160,4 +160,4 @@ if __name__ == '__main__':
         np.vstack((test_output_matrix,out))
         
 ##TODO: kalw model
-#    m=kerasModel(signals,downRate,annotations)
+    m=kerasModel(signals[0],downRate,annotations)

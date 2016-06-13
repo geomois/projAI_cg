@@ -1,8 +1,6 @@
 from keras.layers import Convolution1D, UpSampling1D, AveragePooling1D, MaxPooling1D
 from keras.models import Sequential
-from keras.layers import Input,Dense
 from keras.models import Model
-from keras import regularizers
 from keras.optimizers import SGD
 from sklearn.metrics import mean_squared_error
 import numpy as np
@@ -18,7 +16,7 @@ class kerasModel:
         
     def buildModel(self,train):
         model = Sequential()
-        model.add(Convolution1D(32, 32, border_mode='same', activation="tanh", input_shape=(len(self.signals),3)))
+        model.add(Convolution1D(32, 32, border_mode='same', activation="tanh", input_shape=(self.rate[0],1)))
         model.add(AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
         model.add(Convolution1D(32, 32, border_mode='same', activation="tanh"))
         model.add(AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
@@ -35,15 +33,15 @@ class kerasModel:
         model.add(Convolution1D(1, 32, border_mode='same', activation="tanh"))
 
         model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.01, momentum=0.9, nesterov=True))
-#        if train:
-#            print("NOW FITTING")
-#            model.fit(x, x, nb_epoch=5000, batch_size=64)
-#            model.save_weights("weights_1.dat", True)
+        if train:
+            print("NOW FITTING")
+            model.fit(self.signals, self.signals, nb_epoch=5000, batch_size=64)
+            model.save_weights("weights_1.dat", True)
 
         model.load_weights("weights_1.dat")
 
 
-        predictions = model.predict_on_batch(x)
+#        predictions = model.predict_on_batch(x)
 #        error = keras.mean_squared_error(np.resize(x, (len(x), sample_rate)), np.resize(predictions, (len(predictions), sample_rate)))
 #        print("Train Error: %.4f" % error)
 #        for i in range(len(predictions)):
