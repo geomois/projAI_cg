@@ -60,7 +60,7 @@ def readAnnotations(directory,audioPaths):
             for line in content:
                 temp=line.split(' ')
                 l.append([float(temp[0]), float(temp[1]),(True if temp[2]=='sing' else False)])
-            print l
+#            print l
             annotations.append(np.asarray(l))
     
     return annotations
@@ -75,25 +75,25 @@ def downSample(waves,rate):
 	temp=np.asarray(signal.resample(waves[i],(len(waves[i])/rate[i])*newRate))
         resampledSignals.append(temp)
         resampledRates.append(newRate)
-	print 'res i', temp.shape,' ',i    
+#	print 'res i', temp.shape,' ',i    
     return resampledSignals,resampledRates
 
     
 def prepareAnnotations(signals,rate,annotations):
     aWaves=[]
-    for k in range(0,len(signals):
+    for k in range(0,len(signals)):
         aWaveTemp=np.zeros((1,len(signals[k])))
         for j in range(0,len(annotations[i])):
 		 if(annotations[i][j][2]):
 			start=np.ceil(rate[i]*annotations[i][j][0])
                         end=np.floor(rate[i]*annotations[i][j][1])
-		        print 'start ',start
-		        print 'end ',end
+#		        print 'start ',start
+#		        print 'end ',end
 		   # print 'rate ' , rate[i]
 		   # print 'annot ',annotations[i][j][1]
 		   # print aWaveTemp.shape
         	   # print wave.shape
-                    aWaveTemp[0][start:end]=[1 for k in range(int(start),int(end))]
+                        aWaveTemp[0][start:end]=[1 for k in range(int(start),int(end))]
         aWaves.append(aWaveTemp[0])
     
     return aWaves

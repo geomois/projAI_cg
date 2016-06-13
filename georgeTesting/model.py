@@ -1,4 +1,10 @@
-import keras
+from keras.layers import Convolution1D, UpSampling1D, AveragePooling1D, MaxPooling1D
+from keras.models import Sequential
+from keras.layers import Input,Dense
+from keras.models import Model
+from keras import regularizers
+from keras.optimizers import SGD
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
 class kerasModel:
@@ -11,24 +17,24 @@ class kerasModel:
 #    def prepareTrainData(aWaves,rate):
         
     def buildModel(self,train):
-        model = keras.Sequential()
-        model.add(keras.Convolution1D(32, 32, border_mode='same', activation="tanh", input_shape=()))
-        model.add(keras.AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
-        model.add(keras.Convolution1D(32, 32, border_mode='same', activation="tanh"))
-        model.add(keras.AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
-        model.add(keras.Convolution1D(32, 16, border_mode='same', activation="tanh"))
-        model.add(keras.AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
-        model.add(keras.Convolution1D(1, 8, border_mode='same', activation="tanh"))
+        model = Sequential()
+        model.add(Convolution1D(32, 32, border_mode='same', activation="tanh", input_shape=(len(self.signals),3)))
+        model.add(AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
+        model.add(Convolution1D(32, 32, border_mode='same', activation="tanh"))
+        model.add(AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
+        model.add(Convolution1D(32, 16, border_mode='same', activation="tanh"))
+        model.add(AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
+        model.add(Convolution1D(1, 8, border_mode='same', activation="tanh"))
 
-        model.add(keras.UpSampling1D(length=2))
-        model.add(keras.Convolution1D(32, 32, border_mode='same', activation="tanh"))
-        model.add(keras.UpSampling1D(length=2))
-        model.add(keras.Convolution1D(32, 32, border_mode='same', activation="tanh"))
-        model.add(keras.UpSampling1D(length=2))
-        model.add(keras.Convolution1D(32, 32, border_mode='same', activation="tanh"))
-        model.add(keras.Convolution1D(1, 32, border_mode='same', activation="tanh"))
+        model.add(UpSampling1D(length=2))
+        model.add(Convolution1D(32, 32, border_mode='same', activation="tanh"))
+        model.add(UpSampling1D(length=2))
+        model.add(Convolution1D(32, 32, border_mode='same', activation="tanh"))
+        model.add(UpSampling1D(length=2))
+        model.add(Convolution1D(32, 32, border_mode='same', activation="tanh"))
+        model.add(Convolution1D(1, 32, border_mode='same', activation="tanh"))
 
-        model.compile(loss='mean_squared_error', optimizer=keras.SGD(lr=0.01, momentum=0.9, nesterov=True))
+        model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.01, momentum=0.9, nesterov=True))
 #        if train:
 #            print("NOW FITTING")
 #            model.fit(x, x, nb_epoch=5000, batch_size=64)
