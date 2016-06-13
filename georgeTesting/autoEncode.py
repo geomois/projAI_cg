@@ -97,7 +97,12 @@ def toPickle(writeFlag,waves=None,rates=None,annotation=None):
         annotation=pickle.load(open('pickled/annot.pi','rb'))
         rates=pickle.load(open('pickled/rates.pi','rb'))
         return waves,annotation,rates        
-        
+
+def toOgg(waves,rates,paths):
+    print 'toOgg'
+    for i in range(0,len(waves)):
+        sf.write('resampled/'+ os.path.basename(paths[i]),waves[i][:,:],rates[i])
+
 if __name__ == '__main__':
     simpleRun=False
     if sys.argv[3] =='read':
@@ -108,14 +113,20 @@ if __name__ == '__main__':
         signals,downRate=downSample(waves,rate)
         annotationWave=prepareAnnotations(signals,downRate,annotations) 
         toPickle(True,signals,downRate,annotationWave)
-     else:
-         simpleRun=True
-         
-     if simpleRun:
+    elif sys.argv[3] == 'ogg':
         waves,rate,paths=prepareAudio(sys.argv[1])
         annotations=readAnnotations(sys.argv[2],paths)
         signals,downRate=downSample(waves,rate)
         annotationWave=prepareAnnotations(signals,downRate,annotations)
+        toOgg(signals,downRate,paths)
+    else:
+        simpleRun=True
+         
+    if simpleRun:
+       waves,rate,paths=prepareAudio(sys.argv[1])
+       annotations=readAnnotations(sys.argv[2],paths)
+       signals,downRate=downSample(waves,rate)
+       annotationWave=prepareAnnotations(signals,downRate,annotations)
 #    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
 #    annotations=prepareAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
 #    signals,downRate=downSample(waves,rate)
