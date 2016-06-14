@@ -100,13 +100,19 @@ def prepareAnnotations(signals,rate,annotations):
 
 def toPickle(writeFlag,waves=None,rates=None,annotation=None):
     if writeFlag:
-        pickle.dump(annotation,open('pickled/annot.pi','wb'))
-        pickle.dump(waves,open('pickled/wav.pi','wb'))
-        pickle.dump(rates,open('pickled/rates.pi','wb'))
+        if annotation != None:
+            pickle.dump(annotation,open('pickled/annot.pi','wb'))
+        if waves != None:
+            pickle.dump(waves,open('pickled/wav.pi','wb'))
+        if rates != None:        
+            pickle.dump(rates,open('pickled/rates.pi','wb'))
     else:
-        waves= pickle.load(open("pickled/wav.pi","rb"))
-        annotation=pickle.load(open('pickled/annot.pi','rb'))
-        rates=pickle.load(open('pickled/rates.pi','rb'))
+        if waves != None: 
+            waves= pickle.load(open("pickled/wav.pi","rb"))
+        if annotation != None: 
+            annotation=pickle.load(open('pickled/annot.pi','rb'))
+        if rates != None:         
+            rates=pickle.load(open('pickled/rates.pi','rb'))
         return waves,annotation,rates        
 
 def toOgg(waves,rates,paths):
@@ -115,25 +121,25 @@ def toOgg(waves,rates,paths):
         sf.write('resampled/'+ os.path.basename(paths[i]),waves[i][:,:],rates[i])
 
 if __name__ == '__main__':
-    simpleRun=True
+#    simpleRun=True
 
-#    simpleRun=False
-#    if sys.argv[3] =='read':
-#        waves,annotation,rates = toPickle(False)
-#    elif sys.argv[3] =='write':
-#        waves,rate,paths=prepareAudio(sys.argv[1])
-#        annotations=readAnnotations(sys.argv[2],paths)
-#        signals,downRate=downSample(waves,rate)
-#        annotationWave=prepareAnnotations(signals,downRate,annotations) 
-#        toPickle(True,signals,downRate,annotationWave)
-#    elif sys.argv[3] == 'ogg':
-#        waves,rate,paths=prepareAudio(sys.argv[1])
-#        annotations=readAnnotations(sys.argv[2],paths)
-#        signals,downRate=downSample(waves,rate)
-#        annotationWave=prepareAnnotations(signals,downRate,annotations)
-#        toOgg(signals,downRate,paths)
-#    else:
-#        simpleRun=True
+    simpleRun=False
+    if sys.argv[3] =='read':
+        waves,annotation,rates = toPickle(False)
+    elif sys.argv[3] =='write':
+        waves,rate,paths=prepareAudio(sys.argv[1])
+        annotations=readAnnotations(sys.argv[2],paths)
+        signals,downRate=downSample(waves,rate)
+        annotationWave=prepareAnnotations(signals,downRate,annotations) 
+        toPickle(True,signals,downRate,annotationWave)
+    elif sys.argv[3] == 'ogg':
+        waves,rate,paths=prepareAudio(sys.argv[1])
+        annotations=readAnnotations(sys.argv[2],paths)
+        signals,downRate=downSample(waves,rate)
+        annotationWave=prepareAnnotations(signals,downRate,annotations)
+        toOgg(signals,downRate,paths)
+    else:
+        simpleRun=True
          
     if simpleRun:
         print 'simpleRun'
@@ -163,4 +169,4 @@ if __name__ == '__main__':
         
 ##TODO: kalw model
     m=kerasModel(signals[0],downRate,annotations)
-    m.buildModel(True)
+    m.buildAutoEncoder(True)
