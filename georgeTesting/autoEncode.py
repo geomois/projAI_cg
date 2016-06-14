@@ -20,14 +20,14 @@ def prepareAudio(directory):
     oggs=sorted(oggs)
     trainWaves=[]
     trainRates=[]
-    trainRate=0
-    stop=2
+#    trainRate=0
+    stop=1
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
             audioTemp,rateTemp=sf.read(path)
             trainWaves.append(audioTemp)
-            trainRate=rateTemp
+#            trainRate=rateTemp
             count+=1
 	    trainRates.append(rateTemp)
             if count==stop:
@@ -37,7 +37,7 @@ def prepareAudio(directory):
     return trainWaves,trainRates,oggs
 
 def readAnnotations(directory,audioPaths):
-    fileNames=[]
+#    fileNames=[]
     timings=[]
     for path in audioPaths:
         #fileNames.append(os.path.basename(path).split('.')[0])
@@ -115,28 +115,30 @@ def toOgg(waves,rates,paths):
         sf.write('resampled/'+ os.path.basename(paths[i]),waves[i][:,:],rates[i])
 
 if __name__ == '__main__':
-    simpleRun=False
-    if sys.argv[3] =='read':
-        waves,annotation,rates = toPickle(False)
-    elif sys.argv[3] =='write':
-        waves,rate,paths=prepareAudio(sys.argv[1])
-        annotations=readAnnotations(sys.argv[2],paths)
-        signals,downRate=downSample(waves,rate)
-        annotationWave=prepareAnnotations(signals,downRate,annotations) 
-        toPickle(True,signals,downRate,annotationWave)
-    elif sys.argv[3] == 'ogg':
-        waves,rate,paths=prepareAudio(sys.argv[1])
-        annotations=readAnnotations(sys.argv[2],paths)
-        signals,downRate=downSample(waves,rate)
-        annotationWave=prepareAnnotations(signals,downRate,annotations)
-        toOgg(signals,downRate,paths)
-    else:
-        simpleRun=True
+    simpleRun=True
+
+#    simpleRun=False
+#    if sys.argv[3] =='read':
+#        waves,annotation,rates = toPickle(False)
+#    elif sys.argv[3] =='write':
+#        waves,rate,paths=prepareAudio(sys.argv[1])
+#        annotations=readAnnotations(sys.argv[2],paths)
+#        signals,downRate=downSample(waves,rate)
+#        annotationWave=prepareAnnotations(signals,downRate,annotations) 
+#        toPickle(True,signals,downRate,annotationWave)
+#    elif sys.argv[3] == 'ogg':
+#        waves,rate,paths=prepareAudio(sys.argv[1])
+#        annotations=readAnnotations(sys.argv[2],paths)
+#        signals,downRate=downSample(waves,rate)
+#        annotationWave=prepareAnnotations(signals,downRate,annotations)
+#        toOgg(signals,downRate,paths)
+#    else:
+#        simpleRun=True
          
     if simpleRun:
         print 'simpleRun'
-        waves,rate,paths=prepareAudio(sys.argv[1])
-        annotations=readAnnotations(sys.argv[2],paths)
+        waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
+        annotations=readAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
         signals,downRate=downSample(waves,rate)
         annotationWave=prepareAnnotations(signals,downRate,annotations)
 
