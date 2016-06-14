@@ -15,22 +15,22 @@ class kerasModel:
     def buildAutoEncoder(self,train):
         #input_au = Input(shape=(1,22050))
         input_au=Input(shape=(22050,1))
-        x = Convolution1D(32, 2, activation='relu', border_mode='same')(input_img)#16
+        x = Convolution1D(32, 2, activation='relu', border_mode='same')(input_au)#16
         x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(x)
         x = Convolution1D(32, 2, activation='relu', border_mode='same')(x)#16
         encoded = Convolution1D(8, 2, activation='relu', border_mode='same')(x)#8
-        encoder = Model(input=input_img,output=encoded)
+        encoder = Model(input=input_au,output=encoded)
         x = Convolution1D(8, 2, activation='relu', border_mode='same')(encoded)#8
         x=UpSampling1D(length=2)(x)
         x = Convolution1D(16, 2, activation='relu', border_mode='same')(x)#16
         decoded = Convolution1D(1, 2, activation='relu',border_mode='same')(x)#28
-        autoencoder = Model(input_img, decoded)
+        autoencoder = Model(input_au, decoded)
         autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
         
         if train:
             print 'Training..'
-            autoencoder.fit(b,b,nb_epoch=15,batch_size=128,shuffle=True,callbacks=[])
-        model.save_weights("aE_weigths.w", True)
+            autoencoder.fit(self.signals,self.signals,nb_epoch=15,batch_size=128,shuffle=True,callbacks=[])
+        autoencoder.save_weights("aE_weigths.w", True)
     
 #import pickle
 ##c=pickle.load(open("/home/george/Desktop/Project AI/projGit/georgeTesting/ma.pi",'rb'))
@@ -39,7 +39,7 @@ class kerasModel:
 #b=bo.reshape(len(bo),1,len(bo[0]))
 #b=bo
     
-    def buildModel(self,train):
+#    def buildModel(self,train):
 #        model = Sequential()
 #        model.add(Convolution1D(32, 32, border_mode='same', activation="tanh", input_shape=(self.rate[0],1)))
 #        model.add(AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))

@@ -167,6 +167,9 @@ if __name__ == '__main__':
         np.hstack((test_input_matrix,inp))
         np.vstack((test_output_matrix,out))
         
+    
+    outArray=test_output_matrix.reshape((test_output_matrix.shape[0],test_output_matrix.shape[1],1))
+    inArray=test_input_matrix[0].reshape((test_input_matrix[0].shape[0],test_input_matrix[0].shape[1],1))
 ##TODO: kalw model
-    m=kerasModel(test_output_matrix[0],downRate,annotations)
+    m=kerasModel(inArray,downRate,outArray)
     m.buildAutoEncoder(True)
