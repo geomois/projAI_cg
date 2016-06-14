@@ -161,3 +161,4 @@ if __name__ == '__main__':
         
 ##TODO: kalw model
     m=kerasModel(signals[0],downRate,annotations)
+    m.buildModel(True)
