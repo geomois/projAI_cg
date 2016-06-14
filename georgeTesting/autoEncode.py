@@ -143,8 +143,8 @@ if __name__ == '__main__':
          
     if simpleRun:
         print 'simpleRun'
-        waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
-        annotations=readAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
+        waves,rate,paths=prepareAudio(sys.argv[1])
+        annotations=readAnnotations(sys.argv[2],paths)
         signals,downRate=downSample(waves,rate)
         annotationWave=prepareAnnotations(signals,downRate,annotations)
 
@@ -168,5 +168,5 @@ if __name__ == '__main__':
         np.vstack((test_output_matrix,out))
         
 ##TODO: kalw model
-    m=kerasModel(signals[0],downRate,annotations)
+    m=kerasModel(test_output_matrix[0],downRate,annotations)
     m.buildAutoEncoder(True)
