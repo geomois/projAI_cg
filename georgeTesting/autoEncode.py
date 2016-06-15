@@ -1,3 +1,5 @@
+#call: python <scriptName> <trainFiles directory> <annotations directory> <read> or <write> or <ogg> or <simple> <number of files to read>
+
 import numpy as np
 import soundfile as sf
 import os
@@ -6,8 +8,9 @@ from model import kerasModel
 import scipy.signal as signal
 import pickle
 from toyPipeline import MyAudio
+import gzip
 
-def prepareAudio(directory):
+def prepareAudio(directory,size=1):
     oggs=[]
     for subdir, dirs, files in os.walk(directory):
         for f in files:
@@ -19,7 +22,11 @@ def prepareAudio(directory):
     oggs=sorted(oggs)
     trainWaves=[]
     trainRates=[]
-    stop=25
+    if size>len(oggs):
+        stop=len(oggs)
+    else:
+        stop=size
+        
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
@@ -37,18 +44,8 @@ def readAnnotations(directory,audioPaths):
 #    fileNames=[]
     timings=[]
     for path in audioPaths:
-#    fileNames.append(os.path.basename(path).split('.')[0])
-	timings.append(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
+        timings.append(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
 #	print os.path.basename(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
-        
-    #timings=[]
-    #for subdir, dirs, files in os.walk(directory):
-        #for f in files:
-            #if f.split('.')[0] in fileNames:
-                # timings.append(os.path.join(subdir,f))
-		 #print f
-#    timings=sorted(timings)
-    
     annotations=[]
     for path in timings:
         with open(path,'r') as aFile:
@@ -68,8 +65,9 @@ def downSample(waves,rate):
     resampledRates=[]
     for i in range(0,len(waves)):
         newRate=(rate[i]*percentage)/100
-	temp=np.asarray(signal.resample(waves[i],(len(waves[i])/rate[i])*newRate))
+        temp=np.asarray(signal.resample(waves[i],(len(waves[i])/rate[i])*newRate))
         resampledSignals.append(temp)
+        print 'reasampled: ',i
         resampledRates.append(newRate)
  
     return resampledSignals,resampledRates
@@ -91,33 +89,47 @@ def prepareAnnotations(signals,rate,annotations):
 def toPickle(writeFlag,waves=None,rates=None,annotation=None):
     if writeFlag:
         if annotation != None:
-            pickle.dump(annotation,open('pickled/annot.pi','wb'))
+            f = gzip.open('pickled/annot.pi.pklz','wb')
+            pickle.dump(annotation,f)
+            f.close()
         if waves != None:
-            pickle.dump(waves,open('pickled/wav.pi','wb'))
-        if rates != None:        
+            f = gzip.open('pickled/wav.pi.pklz','wb')
+            pickle.dump(waves,f)
+            f.close()
+        if rates != None:
+            f=gzip.open('pickled/rates.pi.pklz','wb')
             pickle.dump(rates,open('pickled/rates.pi','wb'))
+            f.close()
     else:
-        if waves != None: 
+        if waves != None:
+            f=gzip.open('pickled/wav.pi.pklz','rb')
+            waves=pickle.load(f)
+            f.close()
             waves= pickle.load(open("pickled/wav.pi","rb"))
-        if annotation != None: 
+        if annotation != None:
+            f=gzip.open('pickled/annot.pi.pklz','rb')
+            annotation=pickle.load(f)
+            f.close()
             annotation=pickle.load(open('pickled/annot.pi','rb'))
-        if rates != None:         
-            rates=pickle.load(open('pickled/rates.pi','rb'))
+        if rates != None:
+            f=gzip.open('pickled/rates.pi.pklz','rb')
+            rates=pickle.load(f)
+            f.close()
+            
         return waves,annotation,rates        
+
 
 def toOgg(waves,rates,paths):
     print 'toOgg'
     for i in range(0,len(waves)):
         sf.write('resampled/'+ os.path.basename(paths[i]),waves[i][:,:],rates[i])
 
-
-
 if __name__ == '__main__':
 #    simpleRun=True
 
     simpleRun=False
     if sys.argv[3] =='read':
-        waves,annotation,rates = toPickle(False)
+        waves,annotation,rates = toPickle(False,1,1,1)
     elif sys.argv[3] =='write':
         waves,rate,paths=prepareAudio(sys.argv[1])
         annotations=readAnnotations(sys.argv[2],paths)
@@ -135,7 +147,7 @@ if __name__ == '__main__':
          
     if simpleRun:
         print 'simpleRun'
-        waves,rate,paths=prepareAudio(sys.argv[1])
+        waves,rate,paths=prepareAudio(sys.argv[1],int(sys.argv[4]))
         annotations=readAnnotations(sys.argv[2],paths)
         signals,downRate=downSample(waves,rate)
         annotationWave=prepareAnnotations(signals,downRate,annotations)
