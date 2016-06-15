@@ -170,6 +170,9 @@ if __name__ == '__main__':
     
     outArray=test_output_matrix.reshape((test_output_matrix.shape[0],test_output_matrix.shape[1],1))
     inArray=test_input_matrix[0].reshape((test_input_matrix[0].shape[0],test_input_matrix[0].shape[1],1))
-##TODO: kalw model
-    m=kerasModel(inArray,downRate,outArray)
-    m.buildAutoEncoder(True)
+
+    print "outArray ", outArray.shape
+    print "inArray ", inArray.shape
+
+#    m=kerasModel(inArray,downRate,outArray)
+#    m.buildAutoEncoder(True)
