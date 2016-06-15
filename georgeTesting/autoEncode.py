@@ -19,14 +19,12 @@ def prepareAudio(directory):
     oggs=sorted(oggs)
     trainWaves=[]
     trainRates=[]
-#    trainRate=0
     stop=25
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
             audioTemp,rateTemp=sf.read(path)
             trainWaves.append(audioTemp)
-#            trainRate=rateTemp
             count+=1
 	    trainRates.append(rateTemp)
             if count==stop:
@@ -39,7 +37,7 @@ def readAnnotations(directory,audioPaths):
 #    fileNames=[]
     timings=[]
     for path in audioPaths:
-        #fileNames.append(os.path.basename(path).split('.')[0])
+#    fileNames.append(os.path.basename(path).split('.')[0])
 	timings.append(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
 #	print os.path.basename(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
         
@@ -59,7 +57,6 @@ def readAnnotations(directory,audioPaths):
             for line in content:
                 temp=line.split(' ')
                 l.append([float(temp[0]), float(temp[1]),(True if temp[2]=='sing' else False)])
-#            print l
             annotations.append(np.asarray(l))
     
     return annotations
@@ -74,7 +71,7 @@ def downSample(waves,rate):
 	temp=np.asarray(signal.resample(waves[i],(len(waves[i])/rate[i])*newRate))
         resampledSignals.append(temp)
         resampledRates.append(newRate)
-#	print 'res i', temp.shape,' ',i    
+ 
     return resampledSignals,resampledRates
 
     
@@ -86,12 +83,6 @@ def prepareAnnotations(signals,rate,annotations):
 		 if(annotations[k][j][2]):
 			start=np.ceil(rate[k]*annotations[k][j][0])
                         end=np.floor(rate[k]*annotations[k][j][1])
-#		        print 'start ',start
-#		        print 'end ',end
-		   # print 'rate ' , rate[k]
-		   # print 'annot ',annotations[k][j][1]
-		   # print aWaveTemp.shape
-        	   # print wave.shape
                         aWaveTemp[0][start:end]=[1 for u in range(int(start),int(end))]
         aWaves.append(aWaveTemp[0])
     
@@ -118,6 +109,8 @@ def toOgg(waves,rates,paths):
     print 'toOgg'
     for i in range(0,len(waves)):
         sf.write('resampled/'+ os.path.basename(paths[i]),waves[i][:,:],rates[i])
+
+
 
 if __name__ == '__main__':
 #    simpleRun=True
