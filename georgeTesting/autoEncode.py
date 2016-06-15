@@ -6,7 +6,6 @@ from model import kerasModel
 import scipy.signal as signal
 import pickle
 from toyPipeline import MyAudio
-import models
 
 def prepareAudio(directory):
     oggs=[]
@@ -164,8 +163,8 @@ if __name__ == '__main__':
         test=MyAudio(downRate[i],signals[i],1,annotationWave[i])
         test.split()
         inp,out=test.getInputOutputMatrices()
-        np.hstack((test_input_matrix,inp))
-        np.vstack((test_output_matrix,out))
+        test_input_matrix=np.hstack((test_input_matrix,inp))
+        test_output_matrix=np.vstack((test_output_matrix,out))
         
     
     outArray=test_output_matrix.reshape((test_output_matrix.shape[0],test_output_matrix.shape[1],1))
@@ -174,6 +173,6 @@ if __name__ == '__main__':
     print "outArray ", outArray.shape
     print "inArray ", inArray.shape
 
-#    m=kerasModel(inArray,downRate,outArray)
-#    m.buildAutoEncoder(True)
+    m=kerasModel(inArray,downRate,outArray)
+    m.buildAutoEncoder(True)
 
