@@ -89,30 +89,30 @@ def prepareAnnotations(signals,rate,annotations):
 def toPickle(writeFlag,waves=None,rates=None,annotation=None):
     if writeFlag:
         if annotation != None:
-            f = gzip.open('pickled/annot.pi.pklz','wb')
+            f = gzip.open('/local/gms590/pickled/annot.pi.pklz','wb')
             pickle.dump(annotation,f)
             f.close()
         if waves != None:
-            f = gzip.open('pickled/wav.pi.pklz','wb')
+            f = gzip.open('/local/gms590/pickled/wav.pi.pklz','wb')
             pickle.dump(waves,f)
             f.close()
         if rates != None:
-            f=gzip.open('pickled/rates.pi.pklz','wb')
-            pickle.dump(rates,open('pickled/rates.pi','wb'))
+            f=gzip.open('/local/gms590/pickled/rates.pi.pklz','wb')
+            pickle.dump(rates,open('/local/gms590/pickled/rates.pi','wb'))
             f.close()
     else:
         if waves != None:
-            f=gzip.open('pickled/wav.pi.pklz','rb')
+            f=gzip.open('/local/gms590/pickled/wav.pi.pklz','rb')
             waves=pickle.load(f)
             f.close()
-            waves= pickle.load(open("pickled/wav.pi","rb"))
+            waves= pickle.load(open("/local/gms590/pickled/wav.pi","rb"))
         if annotation != None:
-            f=gzip.open('pickled/annot.pi.pklz','rb')
+            f=gzip.open('/local/gms590/pickled/annot.pi.pklz','rb')
             annotation=pickle.load(f)
             f.close()
-            annotation=pickle.load(open('pickled/annot.pi','rb'))
+            annotation=pickle.load(open('/local/gms590/pickled/annot.pi','rb'))
         if rates != None:
-            f=gzip.open('pickled/rates.pi.pklz','rb')
+            f=gzip.open('/local/gms590/pickled/rates.pi.pklz','rb')
             rates=pickle.load(f)
             f.close()
             
@@ -122,7 +122,7 @@ def toPickle(writeFlag,waves=None,rates=None,annotation=None):
 def toOgg(waves,rates,paths):
     print 'toOgg'
     for i in range(0,len(waves)):
-        sf.write('resampled/'+ os.path.basename(paths[i]),waves[i][:,:],rates[i])
+        sf.write('/local/gms590/resampled/'+ os.path.basename(paths[i]),waves[i][:,:],rates[i])
 
 if __name__ == '__main__':
 #    simpleRun=True
