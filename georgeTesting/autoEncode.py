@@ -20,7 +20,7 @@ def prepareAudio(directory):
     trainWaves=[]
     trainRates=[]
 #    trainRate=0
-    stop=1
+    stop=25
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
