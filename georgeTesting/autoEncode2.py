@@ -22,7 +22,7 @@ def prepareAudio(directory):
     trainWaves=[]
     trainRates=[]
 #    trainRate=0
-    stop=1
+    stop=4
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
@@ -43,8 +43,8 @@ def readAnnotations(directory,audioPaths):
     timings=[]
     for path in audioPaths:
         #fileNames.append(os.path.basename(path).split('.')[0])
-        timings.append(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+$
-#	print os.path.basename(os.path.dirname(directory)+'/'+os.path.basename(path).split($
+        timings.append(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
+#	print os.path.basename(os.path.dirname(directory)+'/'+os.path.basename(path).split('.')[0]+'.lab')
 
     #timings=[]
     #for subdir, dirs, files in os.walk(directory):
@@ -68,7 +68,7 @@ def readAnnotations(directory,audioPaths):
             l=[]
             for line in content:
                 temp=line.split(' ')
-                l.append([float(temp[0]), float(temp[1]),(True if temp[2]=='sing' else Fals$
+                l.append([float(temp[0]), float(temp[1]),(True if temp[2]=='sing' else False)])
 #            print l
             annotations.append(np.asarray(l))
 
@@ -157,35 +157,33 @@ if __name__ == '__main__':
         signals,downRate=downSample(waves,rate)
         annotationWave=prepareAnnotations(signals,downRate,annotations)
 
-#    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music$
-#    annotations=readAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/j$
-#    signals,downRate=downSample(waves,rate)
-#    annotationWave=prepareAnnotations(signals,downRate,annotations)
-#
- 
-   #for one audio (i.e. signal in class autoEncode.py) call:
-
-    test=MyAudio(downRate[0],signals[0],1,annotationWave[0])
-    test.split()
-    inp,out=test.getInputOutputMatrices()
-    test_input_matrix=inp
-    test_output_matrix=out
+    print "we have now ", len(signals), " signals"
+    #for one audio (i.e. signal in class autoEncode.py) call:
+    current_signal=MyAudio(downRate[0],signals[0],1,annotationWave[0])
+    current_signal.split()
+    inp,out=current_signal.getInputOutputMatrices()
+    input_matrix=inp#will consist of one sec of each signal..all signals concatenated
+    output_matrix=out#will consists of one sec of each signal..all signals concatenated 
     for i in range(1,len(signals)):
-        test=MyAudio(downRate[i],signals[i],1,annotationWave[i])
-        test.split()
-        inp,out=test.getInputOutputMatrices()
-        np.hstack((test_input_matrix,inp))
-        np.vstack((test_output_matrix,out))
+        current_signal=MyAudio(downRate[i],signals[i],1,annotationWave[i])
+        current_signal.split()
+        inp,out=current_signal.getInputOutputMatrices()
+        input_matrix=np.hstack((input_matrix,inp))#concatenate signals seconds
+        output_matrix=np.vstack((output_matrix,out))#concatenate audios annotations seconds
 
+    print "input_matrix ",input_matrix.shape
+    print "output_matrix ",output_matrix.shape
+    
+    #outArray=output_matrix.reshape((output_matrix.shape[0],output_matrix.shape[1],1))
+    #inArray=input_matrix[0].reshape((input_matrix[0].shape[0],input_matrix[0].shape[1],1))
 
-    outArray=test_output_matrix.reshape((test_output_matrix.shape[0],test_output_matrix.sha$
-    inArray=test_input_matrix[0].reshape((test_input_matrix[0].shape[0],test_input_matrix[0$
+    inArray=input_matrix.reshape((input_matrix.shape[1],2,1,input_matrix.shape[2]))
+    outArray=output_matrix.reshape((output_matrix.shape[0],1,1,output_matrix.shape[1]))
 
-
-
-    inArray=test_input_matrix.reshape((test_input_matrix.shape[0],2,1,test_input_matrix.shape[1]))
     print "outArray ", outArray.shape
     print "inArray ", inArray.shape    
+    
+    
     mymodel=Models()
     autoencoder=mymodel.model2use(inArray.shape[3])
     mymodel.applymodel(autoencoder,inArray,outArray,0.3,'adadelta','bin',15,128,'keras_w')
@@ -198,5 +196,5 @@ if __name__ == '__main__':
 
     #deimgs=trainedautoencoder.predict(x[10:20])
     #print "deimg",deimgs.shape
-
-
+    
+    print "decoded_imgs[0:10]",decoded_imgs[0:10]
