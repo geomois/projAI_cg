@@ -12,7 +12,7 @@ class kerasModel:
         self.rate=rate
         self.annotations=annotations
 
-    def buildAutoEncoder(self,train):
+    def buildAutoEncoder(self,train,):
         #input_au = Input(shape=(1,22050))
         input_au=Input(shape=(22050,1))
         x = Convolution1D(32, 2, activation='relu', border_mode='same')(input_au)#16
@@ -31,7 +31,9 @@ class kerasModel:
             print 'Training..'
             autoencoder.fit(self.signals,self.signals,nb_epoch=15,batch_size=128,shuffle=True,callbacks=[])
         autoencoder.save_weights("aE_weigths.w", True)
-    
+        predictions = autoencoder.predict_on_batch(self.signals)
+        error = mean_squared_error(np.resize(self.signals, (len(self.signals), self.rate[0])), np.resize(predictions, (len(predictions), self.rate[0])))
+        print 'error ', error
 #import pickle
 ##c=pickle.load(open("/home/george/Desktop/Project AI/projGit/georgeTesting/ma.pi",'rb'))
 #c=pickle.load(open("/home/gms590/git/projAI_cg/georgeTesting/ma.pi",'rb'))
