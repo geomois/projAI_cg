@@ -1,1 +1,0 @@
-# projAI_cg
