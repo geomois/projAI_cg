@@ -30,6 +30,7 @@ def prepareAudio(directory, size=1):
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
+            print os.path.basename(path)
             audioTemp, rateTemp = sf.read(path)
             trainWaves.append(audioTemp)
             count += 1
@@ -154,10 +155,7 @@ if __name__ == '__main__':
         for g in range(0,length,2):
             tempWaves=waves[0:2]
             tempSignals, downRate = downSample(tempWaves, rate)
-            if g ==0:
-                signals.append(tempSignals)
-            else:
-                signals.extend(tempSignals)
+            signals.extend(tempSignals)
             del waves[0:2]
 
         annotationWave = prepareAnnotations(signals, downRate, annotations)
