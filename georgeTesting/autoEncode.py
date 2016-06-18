@@ -95,7 +95,6 @@ def prepareAnnotations(signals, rate, annotations):
 
     return aWaves
 
-
 def toPickle(writeFlag, waves=None, rates=None, annotation=None):
     if writeFlag:
         if annotation != None:
@@ -150,7 +149,17 @@ if __name__ == '__main__':
         waves, rate, paths = prepareAudio(sys.argv[1],int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
         waves = toMono(waves)
-        signals, downRate = downSample(waves, rate)
+        length=len(waves)
+        signals=[]
+        for g in range(0,length,2):
+            tempWaves=waves[0:2]
+            tempSignals, downRate = downSample(tempWaves, rate)
+            if g ==0:
+                signals.append(tempSignals)
+            else:
+                signals.extend(tempSignals)
+            del waves[0:2]
+
         annotationWave = prepareAnnotations(signals, downRate, annotations)
         toWav(signals, downRate, paths)
         print 'done saving'
