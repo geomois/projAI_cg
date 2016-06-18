@@ -3,10 +3,10 @@ import numpy as np
 import soundfile as sf
 import os
 import sys
-# from model import kerasModel
+from model import kerasModel
 import scipy.signal as signal
 import pickle
-from toyPipeline import MyAudio
+from monoPipeline import MyAudio
 import gzip
 
 
