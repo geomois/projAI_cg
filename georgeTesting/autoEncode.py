@@ -200,11 +200,11 @@ if __name__ == '__main__':
         signals, downRate = downSample(waves, rate, None)
         annotationWave = prepareAnnotations(signals, downRate, annotations)
 
-    outArray,inArray=prepareForKeras(downRate,signals,annotationWave)
-    outValid,inValid=prepareForKeras(validRate,validSignals,validAnnotWave)
-    print "outArray ", outArray.shape
-    print "inArray ", inArray.shape
-    print 'outValid ',outValid
-    print 'inValid ',inValid
-    m = kerasModel(inArray, downRate, outArray,outValid,inValid,validRate)
-    m.buildAutoEncoder(True, outArray,annotationWave)
+    annotArray,sigArray=prepareForKeras(downRate,signals,annotationWave)
+    annotValid,sigValid=prepareForKeras(validRate,validSignals,validAnnotWave)
+    print "outArray ", annotArray.shape
+    print "inArray ", sigArray.shape
+    print 'outValid ', annotValid.shape
+    print 'inValid ', sigValid.shape
+    m = kerasModel(sigArray, downRate,annotArray,sigValid,annotValid,validRate)
+    m.buildAutoEncoder(True, annotArray)

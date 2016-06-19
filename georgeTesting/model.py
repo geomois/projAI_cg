@@ -16,8 +16,7 @@ class kerasModel:
         self.validRate=vRate
 
     def buildAutoEncoder(self,train,target=None):
-        #input_au = Input(shape=(1,22050))
-        print 'bluuu ',self.signals.shape[1]
+        print 'blu ', self.signals.shape[1]
         input_au=Input(shape=(self.signals.shape[1], 1))
         x = Convolution1D(32, 2, activation='relu', border_mode='same')(input_au)#16
         x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(x)
