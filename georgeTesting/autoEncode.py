@@ -133,13 +133,41 @@ def toWav(waves, rates, paths):
     for i in range(0, len(waves)):
         sf.write('../resampledValid/'+os.path.basename(paths[i]).split('.')[0]+'.wav', waves[i], rates[i])
 
+def prepareForKeras(downRate,signals,annotationWave):
+    # for one audio (i.e. signal in class autoEncode.py) call:
+
+    endFile=[]
+    test = MyAudio(downRate[0], signals[0], 1, annotationWave[0])
+    test.split()
+    inp, out = test.getInputOutputMatrices()
+    test_input_matrix = inp
+    test_output_matrix = out
+    endFile.append(len(test_output_matrix))
+    for i in range(1, len(signals)):
+        test = MyAudio(downRate[i], signals[i], 1, annotationWave[i])
+        test.split()
+        inp, out = test.getInputOutputMatrices()
+        test_input_matrix = np.hstack((test_input_matrix, inp))
+        test_output_matrix = np.vstack((test_output_matrix, out))
+        endFile.append(len(test_output_matrix))
+
+    outArray = test_output_matrix.reshape((test_output_matrix.shape[0], test_output_matrix.shape[1], 1))
+    inArray = test_input_matrix[0].reshape((test_input_matrix[0].shape[0], test_input_matrix[0].shape[1], 1))
+
+    return outArray,inArray
+
+
 if __name__ == '__main__':
     simpleRun = False
-    if sys.argv[3] == 'read':
-        # waves, annotation, foo = toPickle(False, None, None, 1)
-        signals,downRate,paths=prepareAudio('../resampled/', 100)
+    if sys.argv[3] == 'read' or sys.argv[3] == 'readValid':
+        signals, downRate, paths=prepareAudio('../resampled/', 100)
         annotations = readAnnotations(sys.argv[2], paths)
         annotationWave=prepareAnnotations(signals, downRate, annotations)
+        if sys.argv[3] == 'readValid':
+            validSignals, validRate, validPaths = prepareAudio('../resampledValid/', 100)
+            annotations = readAnnotations(sys.argv[2], validPaths)
+            validAnnotWave = prepareAnnotations(validSignals, validRate, annotations)
+
     elif sys.argv[3] == 'write':
         waves, rate, paths = prepareAudio(sys.argv[1], int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
@@ -172,27 +200,9 @@ if __name__ == '__main__':
         signals, downRate = downSample(waves, rate, None)
         annotationWave = prepareAnnotations(signals, downRate, annotations)
 
-    # for one audio (i.e. signal in class autoEncode.py) call:
-
-    endFile=[]
-    test = MyAudio(downRate[0], signals[0], 1, annotationWave[0])
-    test.split()
-    inp, out = test.getInputOutputMatrices()
-    test_input_matrix = inp
-    test_output_matrix = out
-    endFile.append(len(test_output_matrix))
-    for i in range(1, len(signals)):
-        test = MyAudio(downRate[i], signals[i], 1, annotationWave[i])
-        test.split()
-        inp, out = test.getInputOutputMatrices()
-        test_input_matrix = np.hstack((test_input_matrix, inp))
-        test_output_matrix = np.vstack((test_output_matrix, out))
-        endFile.append(len(test_output_matrix))
-
-    outArray = test_output_matrix.reshape((test_output_matrix.shape[0], test_output_matrix.shape[1], 1))
-    inArray = test_input_matrix[0].reshape((test_input_matrix[0].shape[0], test_input_matrix[0].shape[1], 1))
-
+    outArray,inArray=prepareForKeras(downRate,signals,annotationWave)
+    outValid,inValid=prepareForKeras(validRate,validSignals,validAnnotWave)
     print "outArray ", outArray.shape
     print "inArray ", inArray.shape
-    m = kerasModel(inArray, downRate, outArray)
-    m.buildAutoEncoder(True, outArray)
+    m = kerasModel(inArray, downRate, outArray,outValid,inValid,validRate)
+    m.buildAutoEncoder(True, outArray,target=annotationWave)
