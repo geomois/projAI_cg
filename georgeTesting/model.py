@@ -14,7 +14,8 @@ class kerasModel:
 
     def buildAutoEncoder(self,train,target=None):
         #input_au = Input(shape=(1,22050))
-        input_au=Input(shape=(22050,1))
+        print 'bluuu ',len(self.signals.shape[1])
+        input_au=Input(shape=(len(self.signals.shape[1]),1))
         x = Convolution1D(32, 2, activation='relu', border_mode='same')(input_au)#16
         x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(x)
         x = Convolution1D(32, 2, activation='relu', border_mode='same')(x)#16
