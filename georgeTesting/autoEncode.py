@@ -150,7 +150,7 @@ if __name__ == '__main__':
         waves, rate, paths = prepareAudio(sys.argv[1],int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
         waves = toMono(waves)
-        signals, downRate = downSample(waves, rate,paths)
+        signals, downRate = downSample(waves, rate, paths)
         # length=len(waves)
         # signals=[]
         # for g in range(0,length,2):
@@ -208,4 +208,4 @@ if __name__ == '__main__':
     print "outArray ", outArray.shape
     print "inArray ", inArray.shape
     m = kerasModel(inArray, downRate, outArray)
-    m.buildAutoEncoder(True)
+    m.buildAutoEncoder(True, outArray)
