@@ -30,7 +30,7 @@ def prepareAudio(directory, size=1):
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
-            print os.path.basename(path)
+            print count,' ',os.path.basename(path)
             audioTemp, rateTemp = sf.read(path)
             trainWaves.append(audioTemp)
             count += 1
@@ -96,7 +96,7 @@ def prepareAnnotations(signals, rate, annotations):
 
     return aWaves
 
-def toPickle(writeFlag, waves=None, rates=None, annotation=None):
+def toPickle(writeFlag, waves=None, rates=None , annotation=None):
     if writeFlag:
         if annotation != None:
             f = gzip.open('/local/gms590/pickled/annot.pi.pklz', 'wb')
@@ -150,13 +150,14 @@ if __name__ == '__main__':
         waves, rate, paths = prepareAudio(sys.argv[1],int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
         waves = toMono(waves)
-        length=len(waves)
-        signals=[]
-        for g in range(0,length,2):
-            tempWaves=waves[0:2]
-            tempSignals, downRate = downSample(tempWaves, rate)
-            signals.extend(tempSignals)
-            del waves[0:2]
+        signals, downRate = downSample(waves, rate)
+        # length=len(waves)
+        # signals=[]
+        # for g in range(0,length,2):
+        #     tempWaves=waves[0:2]
+        #     tempSignals, downRate = downSample(tempWaves, rate)
+        #     signals.extend(tempSignals)
+        #     del waves[0:2]
 
         annotationWave = prepareAnnotations(signals, downRate, annotations)
         toWav(signals, downRate, paths)
@@ -206,6 +207,5 @@ if __name__ == '__main__':
 
     print "outArray ", outArray.shape
     print "inArray ", inArray.shape
-
-    # m = kerasModel(inArray, downRate, outArray)
-    # m.buildAutoEncoder(True)
+    m = kerasModel(inArray, downRate, outArray)
+    m.buildAutoEncoder(True)
