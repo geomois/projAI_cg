@@ -30,7 +30,6 @@ def prepareAudio(directory, size=1):
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
-            print count," ",os.path.basename(path)
             audioTemp, rateTemp = sf.read(path)
             trainWaves.append(audioTemp)
             count += 1
@@ -39,7 +38,6 @@ def prepareAudio(directory, size=1):
             # sf.write(os.path.dirname(path) + "/" + os.path.basename(path).split('.')[0] + '.wav', audioTemp, rateTemp)
             if count == stop:
                 break
-        sys.exit()
     return trainWaves, trainRates, oggs
 
 
@@ -69,7 +67,7 @@ def toMono(waves):
     return mono
 
 
-def downSample(waves, rate):
+def downSample(waves, rate,paths):
     #   Downsample waveform by percentage of the original signal, fourier transformation
     percentage = 30
     resampledSignals = []
@@ -80,7 +78,8 @@ def downSample(waves, rate):
         resampledSignals.append(temp)
         print 'resampled: ', i
         resampledRates.append(newRate)
-
+        if paths is not None:
+            toWav(temp,newRate,paths[i])
     return resampledSignals, resampledRates
 
 
@@ -130,7 +129,7 @@ def toPickle(writeFlag, waves=None, rates=None , annotation=None):
         return waves, annotation, rates
 
 def toWav(waves, rates, paths):
-    print 'toOgg'
+    print 'toWav'
     for i in range(0, len(waves)):
         sf.write('../resampled/'+os.path.basename(paths[i]).split('.')[0]+'.wav', waves[i], rates[i])
 
@@ -144,14 +143,14 @@ if __name__ == '__main__':
     elif sys.argv[3] == 'write':
         waves, rate, paths = prepareAudio(sys.argv[1], int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
-        signals, downRate = downSample(waves, rate)
+        signals, downRate = downSample(waves, rate,None)
         annotationWave = prepareAnnotations(signals, downRate, annotations)
         toPickle(True, signals, downRate, annotationWave)
     elif sys.argv[3] == 'wav':
         waves, rate, paths = prepareAudio(sys.argv[1],int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
         waves = toMono(waves)
-        signals, downRate = downSample(waves, rate)
+        signals, downRate = downSample(waves, rate,paths)
         # length=len(waves)
         # signals=[]
         # for g in range(0,length,2):
@@ -170,7 +169,7 @@ if __name__ == '__main__':
         print 'simpleRun'
         waves, rate, paths = prepareAudio(sys.argv[1], int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
-        signals, downRate = downSample(waves, rate)
+        signals, downRate = downSample(waves, rate,None)
         annotationWave = prepareAnnotations(signals, downRate, annotations)
 
     # waves, rate, paths = prepareAudio("/home/iam/PycharmProjects/projAI_cg/Annotated_music/train")
