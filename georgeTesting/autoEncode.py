@@ -204,5 +204,7 @@ if __name__ == '__main__':
     outValid,inValid=prepareForKeras(validRate,validSignals,validAnnotWave)
     print "outArray ", outArray.shape
     print "inArray ", inArray.shape
+    print 'outValid ',outValid
+    print 'inValid ',inValid
     m = kerasModel(inArray, downRate, outArray,outValid,inValid,validRate)
-    m.buildAutoEncoder(True, outArray,target=annotationWave)
+    m.buildAutoEncoder(True, outArray,annotationWave)
