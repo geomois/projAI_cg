@@ -30,6 +30,7 @@ def prepareAudio(directory, size=1):
     if (len(oggs) > 0):
         count = 0
         for path in oggs:
+            print count," ",os.path.basename(path)
             audioTemp, rateTemp = sf.read(path)
             trainWaves.append(audioTemp)
             count += 1
@@ -38,6 +39,7 @@ def prepareAudio(directory, size=1):
             # sf.write(os.path.dirname(path) + "/" + os.path.basename(path).split('.')[0] + '.wav', audioTemp, rateTemp)
             if count == stop:
                 break
+        sys.exit()
     return trainWaves, trainRates, oggs
 
 
