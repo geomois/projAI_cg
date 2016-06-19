@@ -79,7 +79,7 @@ def downSample(waves, rate,paths):
         print 'resampled: ', i
         resampledRates.append(newRate)
         if paths is not None:
-            toWav(temp,newRate,paths[i])
+            toWav([temp],[newRate],[paths[i]])
     return resampledSignals, resampledRates
 
 
