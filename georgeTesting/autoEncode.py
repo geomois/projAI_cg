@@ -134,7 +134,7 @@ def toPickle(writeFlag, waves=None, rates=None , annotation=None):
 def toWav(waves, rates, paths):
     print 'toWav'
     for i in range(0, len(waves)):
-        sf.write('../resampled/'+os.path.basename(paths[i]).split('.')[0]+'.wav', waves[i], rates[i])
+        sf.write('../resampledValid/'+os.path.basename(paths[i]).split('.')[0]+'.wav', waves[i], rates[i])
 
 if __name__ == '__main__':
     simpleRun = False
@@ -150,7 +150,7 @@ if __name__ == '__main__':
         annotationWave = prepareAnnotations(signals, downRate, annotations)
         toPickle(True, signals, downRate, annotationWave)
     elif sys.argv[3] == 'wav':
-        waves, rate, paths = prepareAudio(sys.argv[1],int(sys.argv[4]))
+        waves, rate, paths = prepareAudio(sys.argv[1], int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
         waves = toMono(waves)
         signals, downRate = downSample(waves, rate, paths)
@@ -172,22 +172,9 @@ if __name__ == '__main__':
         print 'simpleRun'
         waves, rate, paths = prepareAudio(sys.argv[1], int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
-        signals, downRate = downSample(waves, rate,None)
+        signals, downRate = downSample(waves, rate, None)
         annotationWave = prepareAnnotations(signals, downRate, annotations)
 
-    # waves, rate, paths = prepareAudio("/home/iam/PycharmProjects/projAI_cg/Annotated_music/train")
-    # annotations = readAnnotations("/home/iam/PycharmProjects/projAI_cg/Annotated_music/jamendo_lab/", paths)
-    # waves=toMono(waves)
-    # signals, downRate = downSample(waves, rate)
-    # annotationWave = prepareAnnotations(signals, downRate, annotations)
-    # toWav(signals, downRate, paths)
-    # sys.exit()
-
-    #    waves,rate,paths=prepareAudio("/home/george/Desktop/Project AI/projGit/Annotated_music/train/")
-    #    annotations=readAnnotations("/home/george/Desktop/Project AI/projGit/Annotated_music/jamendo_lab/",paths)
-    #    signals,downRate=downSample(waves,rate)
-    #    annotationWave=prepareAnnotations(signals,downRate,annotations)
-    #
     # for one audio (i.e. signal in class autoEncode.py) call:
 
     endFile=[]

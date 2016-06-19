@@ -6,11 +6,14 @@ from sklearn.metrics import mean_squared_error
 import numpy as np
 
 class kerasModel:
-    def __init__(self,waves,rate,annotations):
+    def __init__(self,waves,rate,annotations,validation,vAnnot,vRate):
         self.data = []
         self.signals=waves
         self.rate=rate
         self.annotations=annotations
+        self.validation=validation
+        self.validAnnotation=vAnnot
+        self.validRate=vRate
 
     def buildAutoEncoder(self,train,target=None):
         #input_au = Input(shape=(1,22050))
@@ -35,6 +38,6 @@ class kerasModel:
             print 'Training..'
             autoencoder.fit(self.signals, target, nb_epoch=15, batch_size=128, shuffle=True, callbacks=[])
         autoencoder.save_weights("aE_weights.w", True)
-        predictions = autoencoder.predict_on_batch(target)
-        error = mean_squared_error(np.resize(self.signals, (len(self.signals), self.rate[0])), np.resize(predictions, (len(predictions), self.rate[0])))
-        print 'error ', error
+        predictions = autoencoder.predict_on_batch(self.validation)
+        error = mean_squared_error(np.resize(self.validation, (len(self.validation), self.validRate)), np.resize(predictions, (len(predictions), self.validRate)))
+        print 'error :', error
