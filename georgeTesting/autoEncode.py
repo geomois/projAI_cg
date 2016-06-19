@@ -38,7 +38,10 @@ def prepareAudio(directory, size=1):
             # sf.write(os.path.dirname(path) + "/" + os.path.basename(path).split('.')[0] + '.wav', audioTemp, rateTemp)
             if count == stop:
                 break
-    return trainWaves, trainRates, oggs
+    del trainWaves[24]
+    del trainRates[24]
+    del oggs[24]
+    return trainWaves[24:], trainRates[24:], oggs[24:]
 
 
 def readAnnotations(directory, audioPaths):
