@@ -207,6 +207,7 @@ if __name__ == '__main__':
     print "sigTrain ", sigArray.shape
     print 'annotValid ', annotValid.shape
     print 'sigValid ', sigValid.shape
-    m = kerasModel(sigArray, downRate,annotArray,sigValid,annotValid,validRate)
-#    m.buildAutoEncoder(True, annotArray)
-    m.predict()
+    batch=100
+    m = kerasModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
+    m.buildAutoEncoder(True, annotArray)
+#    m.predict()
