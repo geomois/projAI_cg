@@ -5,12 +5,12 @@ from keras.models import Model
 from keras.optimizers import SGD
 from sklearn.metrics import mean_squared_error
 import numpy as np
-from model import kModel
+from kModel import kModel
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.io import wavfile
 
 
-grads = K.gradients(loss, combination_image)
+#grads = K.gradients(loss, combination_image)
 class styleTransfer:
     def __init__(self, model, sampleRate, contentSignal, styleSignal):
         self.sampleRate=sampleRate 
@@ -24,8 +24,8 @@ class styleTransfer:
 #        self.validSignal=validSignal
 #        self.validAnnot=validAnnot
 #        self.validRate=validRate
-        self.contentSignal=K.variable(shapeArray(contentSignal))
-        self.styleSignal=K.variable(shapeArray(styleSignal))
+        self.contentSignal=K.variable(self.shapeArray(contentSignal))
+        self.styleSignal=K.variable(self.shapeArray(styleSignal))
         self.placeholder=K.placeholder(self.contentSignal.shape)
         self.inputTensor=K.concatenate([self.contentSignal,self.styleSignal,self.placeholder],axis=0)
         self.kModel=model# this is the object, not the model
@@ -38,11 +38,11 @@ class styleTransfer:
         return ar
         
     def buildModel(self):
-        netModel.build(train=False,input_au,None)
+        netModel.build(False,input_au)
         self.netModel=kModel.getModel()
         self.output=dict([(layer.name, layer.output) for layer in netModel.layers])        
         print '2__'        
-        loss=K.variable(0.0)
+        self.loss=K.variable(0.0)
         fMap=outputs_dict['conv1']
         contentFMap=fMap[0,:,:]
         placeholderFMap=fMap[2,:,:]
