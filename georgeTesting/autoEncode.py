@@ -91,7 +91,7 @@ def prepareAnnotations(signals, rate, annotations):
             if (annotations[k][j][2]):
                 start = np.ceil(rate[k] * annotations[k][j][0])
                 end = np.floor(rate[k] * annotations[k][j][1])
-                aWaveTemp[0][start:end] = [1 for u in range(int(start), int(end))]
+                aWaveTemp[0][int(start):int(end)] = [1 for u in range(int(start), int(end))]
         aWaves.append(aWaveTemp[0])
 
     return aWaves
@@ -208,6 +208,27 @@ if __name__ == '__main__':
     print 'annotValid ', annotValid.shape
     print 'sigValid ', sigValid.shape
     batch=100
-    m = kerasModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
-    m.buildAutoEncoder(True, annotArray)
-#    m.predict()
+    
+    m = kerasModel(sigArray,annotArray,sigValid,annotValid)    
+    """
+    m.buildAutoEncoder(32,2,'mean_squared_error','adadelta','relu')
+    m.autoEncoderTrain(annotArray,10,128,'ae_weights.w_relu')    
+    """     
+    """
+    m.buildAutoEncoder(32,2,'mean_squared_error','adadelta','tanh')
+    m.autoEncoderTrain(annotArray,10,128,'ae_weights_tanh.w')
+    """
+    """
+    m.buildAutoEncoder(32,100,'mean_squared_error','adadelta','relu')
+    m.autoEncoderTrain(annotArray,25,128,'ae_weights_len100.w')
+    """
+    """
+    from keras.layers.advanced_activations import LeakyReLU, PReLU
+    m.buildAutoEncoder(32,100,'mean_squared_error','adadelta',LeakyRelu(alpha=1.0))
+    m.autoEncoderTrain(annotArray,25,128,'ae_weights_len100_elu.w')
+    """
+    m.buildAutoEncoder(256,128,'mean_squared_error','adadelta','relu')
+    m.autoEncoderTrain(annotArray,25,128,'ae_weights_256len128.w')
+ 
+    #m.loadWeights('ae_weights_len100_elu.w')
+
