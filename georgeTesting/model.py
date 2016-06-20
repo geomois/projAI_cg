@@ -14,9 +14,10 @@ class kerasModel:
         self.validation=validation
         self.validAnnotation=vAnnot
         self.validRate=vRate
+        self.autoencoder=None
 
     def buildAutoEncoder(self,train,target=None):
-        print 'blu ', self.signals.shape[1]
+#        print 'blu ', self.signals.shape[1]
         input_au=Input(shape=(self.signals.shape[1], 1))
         x = Convolution1D(32, 2, activation='relu', border_mode='same')(input_au)#16
         x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(x)
@@ -28,16 +29,21 @@ class kerasModel:
         x = UpSampling1D(length=2)(x)
         x = Convolution1D(16, 2, activation='relu', border_mode='same')(x)#16
         decoded = Convolution1D(1, 2, activation='relu',border_mode='same')(x)#28
-        autoencoder = Model(input_au, decoded)
-        autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
+        self.autoencoder = Model(input_au, decoded)
+        self.autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
 
         if target is None:
             target=self.signals
         if train:
             print 'Training..'
-            autoencoder.fit(self.signals, target, nb_epoch=15, batch_size=128, shuffle=True, callbacks=[])
-        autoencoder.save_weights("aE_weights.w", True)
-        predictions = autoencoder.predict_on_batch(self.validation)
+            self.autoencoder.fit(self.signals, target, nb_epoch=15, batch_size=128, shuffle=True, callbacks=[])
+            self.autoencoder.save_weights("aE_weights.w", True)
+        else:
+            self.autoencoder.load_weights('aE_weights.w')
+    
+    def predict(self):
+        self.buildAutoEncoder(False)
+        predictions = self.autoencoder.predict_on_batch(self.validation)
         error = mean_squared_error(np.resize(self.validAnnotation, (len(self.validAnnotation), self.validRate)), np.resize
             (predictions, (len(predictions), self.validRate)))
         print 'error :', error

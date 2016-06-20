@@ -202,9 +202,10 @@ if __name__ == '__main__':
 
     annotArray,sigArray=prepareForKeras(downRate,signals,annotationWave)
     annotValid,sigValid=prepareForKeras(validRate,validSignals,validAnnotWave)
-    print "outArray ", annotArray.shape
-    print "inArray ", sigArray.shape
-    print 'outValid ', annotValid.shape
-    print 'inValid ', sigValid.shape
+    
+    print "annotTrain ", annotArray.shape
+    print "sigTrain ", sigArray.shape
+    print 'annotValid ', annotValid.shape
+    print 'sigValid ', sigValid.shape
     m = kerasModel(sigArray, downRate,annotArray,sigValid,annotValid,validRate)
     m.buildAutoEncoder(True, annotArray)
