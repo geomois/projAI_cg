@@ -5,7 +5,7 @@ from keras.models import Model
 from keras.optimizers import SGD
 from sklearn.metrics import mean_squared_error
 import numpy as np
-from model import kerasModel
+from model import kModel
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.io import wavfile
 

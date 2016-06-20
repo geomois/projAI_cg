@@ -5,7 +5,7 @@ from keras.optimizers import SGD
 from sklearn.metrics import mean_squared_error
 import numpy as np
 
-class kerasModel:
+class kModel:
     def __init__(self, waves, rate, annotations, validation, vAnnot, vRate):
         self.data = []
         self.signals=waves
@@ -45,7 +45,7 @@ class kerasModel:
             self.autoencoder.save_weights("kModel_weights.w", True)
         else:
             self.autoencoder.load_weights('kModel_weights.w')
-    
+        print 'done'
     def predict(self):
         self.buildAutoEncoder(False)
         predictions = self.autoencoder.predict_on_batch(self.validation)
