@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense, Convolution1D, UpSampling1D, AveragePooling1D, MaxPooling1D
+from keras.layers import Input, Convolution1D, UpSampling1D, AveragePooling1D, MaxPooling1D
 from keras.models import Sequential
 from keras.models import Model
 from keras.optimizers import SGD

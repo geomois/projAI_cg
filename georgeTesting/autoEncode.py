@@ -208,4 +208,5 @@ if __name__ == '__main__':
     print 'annotValid ', annotValid.shape
     print 'sigValid ', sigValid.shape
     m = kerasModel(sigArray, downRate,annotArray,sigValid,annotValid,validRate)
-    m.buildAutoEncoder(True, annotArray)
+#    m.buildAutoEncoder(True, annotArray)
+    m.predict()
