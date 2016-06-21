@@ -49,7 +49,7 @@ def start(model, sRate, cSignal, sSignal):
 
 #    build()
     kModel.buildAutoEncoder(False,input_au)
-    netModel=kModel.getModel()
+    netModel,outputLayers=kModel.getModel()
     pdb.set_trace()
     output={}#dict([(layer.name, layer.output) for layer in netModel.layers])
     # output['conv1']=kModel.get_activations1(inputTensor)
@@ -58,14 +58,14 @@ def start(model, sRate, cSignal, sSignal):
     # output['conv4'] = kModel.get_activations4(inputTensor)
     # output['conv5'] = kModel.get_activations5(inputTensor)
 
+    # for key in outputLayers:
+    #     outputLayers[key].predict_on_batch()
 
-    model1 = Sequential()
-    model1.add(Convolution1D(32, 2, activation='relu', border_mode='same', name='conv1',
-                             weights=netModel.layers[0].get_weights()))
-    model1.predict(inputTensor)
     print '2__'
     loss=K.variable(0.0)
-    fMap=output['conv1']
+    pdb.set_trace() #check output shape
+    fMap=outputLayers['encoder1'].predict_on_batch(cSignal)
+
     contentFMap=fMap[0,:,:]
     placeholderFMap=fMap[2,:,:]
     loss+=content_w*contentLoss(contentFMap,placeholderFMap)

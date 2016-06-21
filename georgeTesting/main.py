@@ -188,7 +188,6 @@ if __name__ == '__main__':
         #     tempSignals, downRate = downSample(tempWaves, rate)
         #     signals.extend(tempSignals)
         #     del waves[0:2]
-
         annotationWave = prepareAnnotations(signals, downRate, annotations)
         toWav(signals, downRate, paths)
         print 'done saving'
