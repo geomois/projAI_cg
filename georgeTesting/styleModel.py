@@ -26,8 +26,8 @@ class Evaluator(object):
         self.grad_values = None
         return grad_values
 
-global gradient_function
-global loss_function
+#global gradient_function
+#global loss_function
 def start(model, sRate, cSignal, sSignal):
     sampleRate=sRate
     content_w=0.025
@@ -91,9 +91,12 @@ def start(model, sRate, cSignal, sSignal):
         sGram**=1.0/len(sSignal) #sSignal sould be a list
         loss+=style_w * styleLoss(sGram,g)
         count+=1
+    global gradient_function
+    global loss_function
     gradient_function=T.function([X], K.flatten(K.gradients(loss,X)) ,allow_input_downcast=True)
     loss_function=T.function([X],loss,allow_input_downcast=True)
-
+    global iteration_count
+    iteration_count = 0
     bounds = [[-0.9, 0.9]]
     bounds = np.repeat(bounds, countSamples, axis=0)
 
@@ -114,6 +117,7 @@ def start(model, sRate, cSignal, sSignal):
 
 def optimization_callback(xk):
     global iteration_count
+    
     if iteration_count % 10 == 0:
         current_x = np.copy(xk)
         wavfile.write('output%d.wav' % iteration_count, countSamples, current_x.astype(np.int16))
