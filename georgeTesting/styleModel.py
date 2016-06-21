@@ -34,16 +34,16 @@ def start(model, sRate, cSignal, sSignal):
     content_w=0.025
     print 'sRate ', sRate
     print 'cSignal ', cSignal.shape
-    print 'sSignal', sSignal.shape
+    print 'sSignal ',sSignal[0].shape
     global countSamples
     countSamples=cSignal.shape[1]
     noise=np.random.random((1,countSamples,1))
     style_w=1.0
-    contentSignal=K.variable(shapeArray(cSignal))
-    styleSignal=K.variable(shapeArray(sSignal))
+    #contentSignal=K.variable(shapeArray(cSignal))
+   # styleSignal=K.variable(shapeArray(sSignal))
     #placeholder=K.placeholder(np.random.random((1,countSamples,1)))
-    placeholder=K.placeholder((1,cSignal.shape[1],1))
-    inputTensor=K.concatenate([contentSignal,styleSignal,placeholder],axis=0)
+    #placeholder=K.placeholder((1,cSignal.shape[1],1))
+    #inputTensor=K.concatenate([contentSignal,styleSignal,placeholder],axis=0)
     kModel=model# this is the object, not the model
     input_au=Input(shape=(3,None,1))#den eimai sigouros
     print '1__'
@@ -75,7 +75,11 @@ def start(model, sRate, cSignal, sSignal):
     c=[]
     g=[]
     s=[]
+    count=0
     for l in outputLayers:
+        print count,' ', cSignal.shape, ' ',str(l)
+	print 'in shape', outputLayers[l].get_input_shape_at(0)
+	print 'out shape', outputLayers[l].get_output_shape_at(0)
         tempC=outputLayers[l].predict(cSignal)
         tempG=outputLayers[l](X)
         c=tempC[0]
@@ -85,17 +89,17 @@ def start(model, sRate, cSignal, sSignal):
             tempS=outputLayers[l].predict(style)
             s=tempS[0]
             sGram*=getGram(s)/style.shape[1]
-        sGram**=1.0/len(styleSignal) #styleSignal sould be a list
+        sGram**=1.0/len(sSignal) #sSignal sould be a list
         loss+=style_w * styleLoss(sGram,g)
-
-    gradient_function=K.function([X],K.flatten(K.gradients(loss,X)))
+        count+=1
+    gradient_function=K.function([X],K.flatten(K.gradients(loss,X)),allow_input_downcast=True)
     loss_function=K.function([X],loss,allow_input_downcast=True)
 
     bounds = [[-0.9, 0.9]]
     bounds = np.repeat(bounds, countSamples, axis=0)
 
     print("optimizing")
-
+    pdb.set_trace()
     y, Vn, info = fmin_l_bfgs_b(
         evaluation,
         noise.astype(np.float64).flatten(),
@@ -127,15 +131,15 @@ def evaluation(x):
 
 
 def getGram(matrix):
-    assert K.ndim(matrix) == 2 , "gram ndim not 2"
+#    assert K.ndim(matrix) == 2 , "gram ndim not 2"
     gram=K.dot(matrix.T,matrix)
     return gram
 #        features = K.batch_flatten(x)
 #        gram = K.dot(features, K.transpose(features))
 
 def styleLoss(style,placehold):
-    assert K.ndim(style)==2 ,"style ndim not 2"
-    assert K.ndim(placehold==2), "placeholder ndim not 2"
+ #   assert K.ndim(style)==2 ,"style ndim not 2"
+  #  assert K.ndim(placehold==2), "placeholder ndim not 2"
 #        predStyle=netModel.predict(styleSignal) #feature maps
     Sg=style
     Pg=getGram(placehold)
