@@ -3,12 +3,12 @@ import numpy as np
 import soundfile as sf
 import os
 import sys
-from model import kerasModel
+from kModel import kModel
 import scipy.signal as signal
 import pickle
 from monoPipeline import MyAudio
 import gzip
-
+from styleModel import styleTransfer
 
 def prepareAudio(directory, size=1):
     oggs = []
@@ -208,6 +208,9 @@ if __name__ == '__main__':
     print 'annotValid ', annotValid.shape
     print 'sigValid ', sigValid.shape
     batch=100
-    m = kerasModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
+    m = kModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
+    sT=styleTransfer(m,downRate[0],sigArray[:326],sigArray[326:652])
+    print 'initiated'
+    sT.run()
 #    m.buildAutoEncoder(True, annotArray)
 #    m.predict()
