@@ -169,7 +169,6 @@ if __name__ == '__main__':
             validSignals, validRate, validPaths = prepareAudio('../resampledValid/', 100)
             annotations = readAnnotations(sys.argv[2], validPaths)
             validAnnotWave = prepareAnnotations(validSignals, validRate, annotations)
-
     elif sys.argv[3] == 'write':
         waves, rate, paths = prepareAudio(sys.argv[1], int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)

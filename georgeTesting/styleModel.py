@@ -45,7 +45,6 @@ def start(model, sRate, cSignal, sSignal):
     #inputTensor=K.concatenate([contentSignal,styleSignal,placeholder],axis=0)
     kModel=model# this is the object, not the model
     input_au=Input(shape=(3,None,1))#den eimai sigouros
-    print '1__'
 
 #    build()
     kModel.buildAutoEncoder(False,input_au)
@@ -60,7 +59,6 @@ def start(model, sRate, cSignal, sSignal):
     # for key in outputLayers:
     #     outputLayers[key].predict_on_batch()
 
-    print '2__'
     # loss=K.variable(0.0)
     # pdb.set_trace() #check output shape
     # fMap=outputLayers['encoder1'].predict_on_batch(cSignal)
@@ -102,7 +100,7 @@ def start(model, sRate, cSignal, sSignal):
 
     print("optimizing")
     pdb.set_trace()
-    y, Vn, info = fmin_l_bfgs_b(
+    opt, Vn, info = fmin_l_bfgs_b(
         evaluation,
         noise.astype(np.float64).flatten(),
         bounds=bounds,
@@ -112,7 +110,7 @@ def start(model, sRate, cSignal, sSignal):
         approx_grad=False,
         callback=optimization_callback)
 
-    wavfile.write('output/output.wav', countSamples, y.astype(np.int16))
+    wavfile.write('../outFiles/output.wav', countSamples, opt.astype(np.int16))
     print("done.")
 
 def optimization_callback(xk):
@@ -120,7 +118,7 @@ def optimization_callback(xk):
     
     if iteration_count % 10 == 0:
         current_x = np.copy(xk)
-        wavfile.write('output%d.wav' % iteration_count, countSamples, current_x.astype(np.int16))
+        wavfile.write('../outFiles/iter/output%d.wav' % iteration_count, countSamples, current_x.astype(np.int16))
     iteration_count += 1
 
 def shapeArray(ar):
