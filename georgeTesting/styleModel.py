@@ -27,7 +27,8 @@ class Evaluator(object):
         self.grad_values = None
         return grad_values
 
-
+global gradient_function
+global loss_function
 def start(model, sRate, cSignal, sSignal):
     sampleRate=sRate
     content_w=0.025
@@ -36,6 +37,7 @@ def start(model, sRate, cSignal, sSignal):
     print 'sSignal', sSignal.shape
     global countSamples
     countSamples=cSignal.shape[1]
+    noise=np.random.random((1,countSamples,1))
     style_w=1.0
     contentSignal=K.variable(shapeArray(cSignal))
     styleSignal=K.variable(shapeArray(sSignal))
@@ -61,53 +63,69 @@ def start(model, sRate, cSignal, sSignal):
     #     outputLayers[key].predict_on_batch()
 
     print '2__'
-    loss=K.variable(0.0)
-    pdb.set_trace() #check output shape
-    fMap=outputLayers['encoder1'].predict_on_batch(cSignal)
+    # loss=K.variable(0.0)
+    # pdb.set_trace() #check output shape
+    # fMap=outputLayers['encoder1'].predict_on_batch(cSignal)
 
-    contentFMap=fMap[0,:,:]
-    placeholderFMap=fMap[2,:,:]
-    loss+=content_w*contentLoss(contentFMap,placeholderFMap)
+    # contentFMap=fMap[0,:,:]
+    # placeholderFMap=fMap[2,:,:]
+    # loss+=content_w*contentLoss(contentFMap,placeholderFMap)
 
-    fLayers=['conv1', 'conv2', 'conv3', 'conv4', 'conv5']
-    for l in fLayers:
-        fMap=output[l]
-        styleFMap=fMap[1,:,:]
-        placeholderFMap=fMap[2,:,:]
-        styleL=styleLoss(styleFMap,placeholderFMap)
-        loss+=(style_w/len(fLayers))*styleL
+    X=Input(shape=(countSamples,1))
+    loss=0
+    c=[]
+    g=[]
+    s=[]
+    for l in outputLayers:
+        tempC=outputLayers[l].predict(noise)
+        tempG=outputLayers[l](X)
+        c=tempC[0]
+        g=tempG[0]#tensor
+        sGram=1
+        for style in styleSignal:
+            tempS=outputLayers[l].predict(style)
+            s=tempS[0]
+            sGram*=getGram(s)/style.shape[1]
+        sGram**=1.0/len(styleSignal) #styleSignal sould be a list
+        loss+=style_w * styleLoss(sGram,g)
 
-    gradients=K.gradients(loss,placeholder)
-    outGradients=[loss]
-#        den 3erw ti paizei edw opote paei comment
-    if type(gradients) in {list, tuple}:
-        outGradients += gradients
-    else:
-        outGradients.append(gradients)
+    gradient_function=K.function([X],K.flatten(K.gradients(loss,X)))
+    loss_function=K.function([X],loss,allow_input_downcast=True)
 
-    global f_outputs
-    f_outputs= K.function([placeholder], outGradients)
-    evaluator = Evaluator()
-    x = shapeArray(np.random.random((1,countSamples,1)))
-    for i in range(10):
-        print('Start of iteration', i)
-        x, min_val, info = fmin_l_bfgs_b(evaluator.loss, x.flatten(),
-                                     fprime=evaluator.grads, maxfun=20)
-        print('Current loss value:', min_val)
-        wavfile.write('outFiles/output%d.wav' %i, sampleRate,x)
+    bounds = [[-0.9, 0.9]]
+    bounds = np.repeat(bounds, countSamples, axis=0)
+
+    print("optimizing")
+
+    y, Vn, info = fmin_l_bfgs_b(
+        evaluation,
+        noise.astype(np.float64).flatten(),
+        bounds=bounds,
+        factr=0.0, pgtol=0.0,
+        maxfun=30000,  # Limit number of calls to evaluate().
+        iprint=1,
+        approx_grad=False,
+        callback=optimization_callback)
+
+    wavfile.write('output/output.wav', countSamples, y.astype(np.int16))
+    print("done.")
+
+def optimization_callback(xk):
+    global iteration_count
+    if iteration_count % 10 == 0:
+        current_x = np.copy(xk)
+        wavfile.write('output%d.wav' % iteration_count, countSamples, current_x.astype(np.int16))
+    iteration_count += 1
 
 def shapeArray(ar):
     return ar
 
 def evaluation(x):
-    x = x.reshape((1,countSamples,1))
-    outs = f_outputs([x])
-    loss_value = outs[0]
-    if len(outs[1:]) == 1:
-        grad_values = outs[1].flatten().astype('float64')
-    else:
-        grad_values = np.array(outs[1:]).flatten().astype('float64')
-    return loss_value, grad_values
+    tempX=np.reshape(x, (1, countSamples, 1)).astype(np.float32)
+    gradients = gradient_function(tempX)
+    total_loss=loss_function(tempX)
+    return total_loss.astype(np.float64),gradients.astype(np.float64)
+
 
 def getGram(matrix):
     assert K.ndim(matrix) == 2 , "gram ndim not 2"
@@ -120,7 +138,7 @@ def styleLoss(style,placehold):
     assert K.ndim(style)==2 ,"style ndim not 2"
     assert K.ndim(placehold==2), "placeholder ndim not 2"
 #        predStyle=netModel.predict(styleSignal) #feature maps
-    Sg=getGram(style)
+    Sg=style
     Pg=getGram(placehold)
     return K.sum(K.square(Sg-Pg))/ K.sum(K.square(Sg)) #may be Sg-Pg
 
