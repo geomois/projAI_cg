@@ -1,6 +1,8 @@
 from keras import backend as K
 import numpy as np
+from keras.layers import ZeroPadding1D,Input, Convolution1D, UpSampling1D, AveragePooling1D, MaxPooling1D
 from keras.layers import Input
+from keras.models import Sequential
 from kModel import kModel
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.io import wavfile
@@ -50,12 +52,17 @@ def start(model, sRate, cSignal, sSignal):
     netModel=kModel.getModel()
     pdb.set_trace()
     output={}#dict([(layer.name, layer.output) for layer in netModel.layers])
-    output['conv1']=kModel.get_activations1(inputTensor)
-    output['conv2'] = kModel.get_activations2(inputTensor)
-    output['conv3'] = kModel.get_activations3(inputTensor)
-    output['conv4'] = kModel.get_activations4(inputTensor)
-    output['conv5'] = kModel.get_activations5(inputTensor)
+    # output['conv1']=kModel.get_activations1(inputTensor)
+    # output['conv2'] = kModel.get_activations2(inputTensor)
+    # output['conv3'] = kModel.get_activations3(inputTensor)
+    # output['conv4'] = kModel.get_activations4(inputTensor)
+    # output['conv5'] = kModel.get_activations5(inputTensor)
 
+
+    model1 = Sequential()
+    model1.add(Convolution1D(32, 2, activation='relu', border_mode='same', name='conv1',
+                             weights=netModel.layers[0].get_weights()))
+    model1.predict(inputTensor)
     print '2__'
     loss=K.variable(0.0)
     fMap=output['conv1']
