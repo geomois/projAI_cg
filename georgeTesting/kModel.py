@@ -16,15 +16,15 @@ class kModel:
         self.validRate=vRate
         self.autoencoder=None
 
-    def buildAutoEncoder(self,train,tensor,inputShape=None,target=None):
-#        print 'blu ', self.signals.shape[1]
+    # noinspection PyPep8Naming
+    def buildAutoEncoder(self,train,ten,inputShape=None,target=None):
         if inputShape is None:
             input_au=Input(shape=(self.signals.shape[1], 1))
         else:
             input_au=inputShape
-            
+        print ten.shape
         firstLayer=Convolution1D(64, 64, activation='relu', border_mode='same',name='conv1')
-        firstLayer.set_input(tensor,shape=input_au)
+        firstLayer.set_input(ten,shape=input_au)
         self.autoencoder=Sequential()
         self.autoencoder.add(firstLayer)
         self.autoencoder.add(AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))

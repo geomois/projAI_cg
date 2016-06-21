@@ -8,7 +8,7 @@ import scipy.signal as signal
 import pickle
 from monoPipeline import MyAudio
 import gzip
-from styleModel import styleTransfer
+from styleModel import *
 
 def prepareAudio(directory, size=1):
     oggs = []
@@ -209,8 +209,9 @@ if __name__ == '__main__':
     print 'sigValid ', sigValid.shape
     batch=100
     m = kModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
-    sT=styleTransfer(m,downRate[0],sigArray[:326],sigArray[326:652])
+    # sT=styleTransfer(m,downRate[0],sigArray[:326],sigArray[326:652])
     print 'initiated'
-    sT.run()
+    start(m,downRate[0],sigArray[:326],sigArray[326:652])
+    # sT.run()
 #    m.buildAutoEncoder(True, annotArray)
 #    m.predict()
