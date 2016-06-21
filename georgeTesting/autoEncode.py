@@ -227,8 +227,8 @@ if __name__ == '__main__':
     m.buildAutoEncoder(32,100,'mean_squared_error','adadelta',LeakyRelu(alpha=1.0))
     m.autoEncoderTrain(annotArray,25,128,'ae_weights_len100_elu.w')
     """
-    m.buildAutoEncoder(256,128,'mean_squared_error','adadelta','relu')
+    m.buildAutoEncoder(32,128,'mean_squared_error','adadelta','relu')
     m.autoEncoderTrain(annotArray,25,128,'ae_weights_256len128.w')
- 
+    
     #m.loadWeights('ae_weights_len100_elu.w')
 
