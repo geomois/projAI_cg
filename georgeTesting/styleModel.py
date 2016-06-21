@@ -46,7 +46,7 @@ def start(model, sRate, cSignal, sSignal):
     print '1__'
 
 #    build()
-    kModel.buildAutoEncoder(False,inputTensor,input_au)
+    kModel.buildAutoEncoder(False,input_au)
     netModel=kModel.getModel()
     pdb.set_trace()
     output={}#dict([(layer.name, layer.output) for layer in netModel.layers])

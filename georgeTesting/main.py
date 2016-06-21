@@ -214,6 +214,5 @@ if __name__ == '__main__':
     print 'initiated'
 #    pdb.set_trace()
     start(m,downRate[0],sigArray[:1],sigArray[326:327])
-    # sT.run()
-#    m.buildAutoEncoder(True,[5],None,annotArray)
+#    m.buildAutoEncoder(True,,None,annotArray)
 #    m.predict()
