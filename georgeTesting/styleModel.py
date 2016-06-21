@@ -2,10 +2,9 @@ from keras import backend as K
 import numpy as np
 from keras.layers import ZeroPadding1D,Input, Convolution1D, UpSampling1D, AveragePooling1D, MaxPooling1D
 from keras.layers import Input
-from keras.models import Sequential
-from kModel import kModel
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.io import wavfile
+import theano as T
 import pdb
 
 class Evaluator(object):
@@ -78,8 +77,8 @@ def start(model, sRate, cSignal, sSignal):
     count=0
     for l in outputLayers:
         print count,' ', cSignal.shape, ' ',str(l)
-	print 'in shape', outputLayers[l].get_input_shape_at(0)
-	print 'out shape', outputLayers[l].get_output_shape_at(0)
+        print 'in shape', outputLayers[l].get_input_shape_at(0)
+        print 'out shape', outputLayers[l].get_output_shape_at(0)
         tempC=outputLayers[l].predict(cSignal)
         tempG=outputLayers[l](X)
         c=tempC[0]
@@ -92,8 +91,8 @@ def start(model, sRate, cSignal, sSignal):
         sGram**=1.0/len(sSignal) #sSignal sould be a list
         loss+=style_w * styleLoss(sGram,g)
         count+=1
-    gradient_function=K.function([X],K.flatten(K.gradients(loss,X)),allow_input_downcast=True)
-    loss_function=K.function([X],loss,allow_input_downcast=True)
+    gradient_function=T.function([X], K.flatten(K.gradients(loss,X)) ,allow_input_downcast=True)
+    loss_function=T.function([X],loss,allow_input_downcast=True)
 
     bounds = [[-0.9, 0.9]]
     bounds = np.repeat(bounds, countSamples, axis=0)
