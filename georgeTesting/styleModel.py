@@ -1,5 +1,6 @@
 from keras import backend as K
 import numpy as np
+from keras.layers import Input
 from kModel import kModel
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.io import wavfile
@@ -16,7 +17,8 @@ class styleTransfer:
         self.style_w=1.0        
         self.contentSignal=K.variable(self.shapeArray(contentSignal))
         self.styleSignal=K.variable(self.shapeArray(styleSignal))
-        self.placeholder=K.placeholder(self.contentSignal.shape)
+        
+        self.placeholder=K.placeholder((1,self.countSamples,1))
         self.inputTensor=K.concatenate([self.contentSignal,self.styleSignal,self.placeholder],axis=0)
         self.kModel=model# this is the object, not the model
 #        self.output=None
