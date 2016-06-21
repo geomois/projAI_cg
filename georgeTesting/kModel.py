@@ -5,6 +5,8 @@ from keras.optimizers import SGD
 from sklearn.metrics import mean_squared_error
 import numpy as np
 import pdb
+import theano
+
 
 class kModel:
     def __init__(self, waves, rate, annotations, validation, vAnnot, vRate):
@@ -24,7 +26,7 @@ class kModel:
         else:
             input_au=inputShape
 
- 	input_au=Input(shape=(self.signals.shape[1], 1))
+        input_au=Input(shape=(self.signals.shape[1], 1))
         x = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv1')(input_au)#16
         x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(x)
         x = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv2')(x)#16
@@ -37,16 +39,32 @@ class kModel:
         decoded = Convolution1D(1, 2, activation='relu',border_mode='same')(x)#28
         self.autoencoder = Model(input_au, decoded)
         self.autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
-
+        self.autoencoder.get_output_at(0)
         
         #pdb.set_trace()
 #        self.autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+
+        self.get_activations1 = theano.function([self.autoencoder.layers[0].input], self.autoencoder.layers[1].output(train=False),
+                                          allow_input_downcast=True)
+
+        self.get_activations2 = theano.function([self.autoencoder.layers[2].input],
+                                           self.autoencoder.layers[3].output(train=False),
+                                           allow_input_downcast=True)
+        self.get_activations3 = theano.function([self.autoencoder.layers[3].input],
+                                           self.autoencoder.layers[4].output(train=False),
+                                           allow_input_downcast=True)
+        self.get_activations4 = theano.function([self.autoencoder.layers[4].input],
+                                           self.autoencoder.layers[5].output(train=False),
+                                           allow_input_downcast=True)
+        self.get_activations5 = theano.function([self.autoencoder.layers[5].input],
+                                           self.autoencoder.layers[6].output(train=False),
+                                           allow_input_downcast=True)
 
         if target is None:
             target=self.signals
         if train:
             print 'Training..'
-            self.autoencoder.fit(self.signals, target, nb_epoch=15, batch_size=128, shuffle=True, callbacks=[])
+            self.autoencoder.fit(self.signals, target, nb_epoch=15, batch_size=64, shuffle=True, callbacks=[])
             self.autoencoder.save_weights("kModel_weights.w", True)
         else:
             self.autoencoder.load_weights('kModel_weights.w')

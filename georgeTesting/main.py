@@ -10,6 +10,7 @@ import pickle
 from monoPipeline import MyAudio
 import gzip
 from styleModel import *
+import pdb
 
 def prepareAudio(directory, size=1):
     oggs = []
@@ -210,7 +211,6 @@ if __name__ == '__main__':
     print 'sigValid ', sigValid.shape
     batch=100
     m = kModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
-    sT=styleTransfer(m,downRate[0],sigArray[:326],sigArray[326:652])
     print 'initiated'
 #    pdb.set_trace()
     start(m,downRate[0],sigArray[:1],sigArray[326:327])

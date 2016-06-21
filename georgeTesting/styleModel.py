@@ -46,11 +46,16 @@ def start(model, sRate, cSignal, sSignal):
     print '1__'
 
 #    build()
-    pdb.set_trace()
     kModel.buildAutoEncoder(False,inputTensor,input_au)
     netModel=kModel.getModel()
     pdb.set_trace()
-    output=dict([(layer.name, layer.output) for layer in netModel.layers])
+    output={}#dict([(layer.name, layer.output) for layer in netModel.layers])
+    output['conv1']=kModel.get_activations1(inputTensor)
+    output['conv2'] = kModel.get_activations2(inputTensor)
+    output['conv3'] = kModel.get_activations3(inputTensor)
+    output['conv4'] = kModel.get_activations4(inputTensor)
+    output['conv5'] = kModel.get_activations5(inputTensor)
+
     print '2__'
     loss=K.variable(0.0)
     fMap=output['conv1']
