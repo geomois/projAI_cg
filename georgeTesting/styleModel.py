@@ -43,7 +43,6 @@ def start(model, sRate, cSignal, sSignal):
     styleSignal=K.variable(shapeArray(sSignal))
     #placeholder=K.placeholder(np.random.random((1,countSamples,1)))
     placeholder=K.placeholder((1,cSignal.shape[1],1))
-    pdb.set_trace()
     inputTensor=K.concatenate([contentSignal,styleSignal,placeholder],axis=0)
     kModel=model# this is the object, not the model
     input_au=Input(shape=(3,None,1))#den eimai sigouros
@@ -77,12 +76,12 @@ def start(model, sRate, cSignal, sSignal):
     g=[]
     s=[]
     for l in outputLayers:
-        tempC=outputLayers[l].predict(noise)
+        tempC=outputLayers[l].predict(cSignal)
         tempG=outputLayers[l](X)
         c=tempC[0]
         g=tempG[0]#tensor
         sGram=1
-        for style in styleSignal:
+        for style in sSignal:
             tempS=outputLayers[l].predict(style)
             s=tempS[0]
             sGram*=getGram(s)/style.shape[1]
