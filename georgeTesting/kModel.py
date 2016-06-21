@@ -32,7 +32,7 @@ class kModel:
         x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(encoded1)
         encoded2 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv2')(x)#16
         self.outLayers['encoder2'] = Model(input=input_au, output=encoded2)
-        encoded3 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv3')(x)#8
+        encoded3 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv3')(encoded2)#8
         self.outLayers['encoder3']= Model(input=input_au, output=encoded3)
 
         encoded4 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv4')(encoded3)#8
@@ -40,10 +40,9 @@ class kModel:
         x = UpSampling1D(length=2)(encoded4)
         encoded5 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv5')(x)#16
         self.outLayers['encoder5']=Model(input=input_au,output=encoded5)
-        decoded = Convolution1D(32, 2, activation='relu',border_mode='same')(x)#28
+        decoded = Convolution1D(32, 2, activation='relu',border_mode='same')(encoded5)#28
         self.autoencoder = Model(input_au, decoded)
         self.autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
-        self.autoencoder.get_output_at(0)
         #pdb.set_trace()
 #        self.autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
         # self.get_activations1 = theano.function([encoder.get], self.autoencoder.layers[1].output(train=False),
