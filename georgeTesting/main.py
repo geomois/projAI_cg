@@ -1,4 +1,5 @@
 # call: python <scriptName> <trainFiles directory> <annotations directory> <read> or <write> or <wav> or <simple> <number of files to read>
+import pdb
 import numpy as np
 import soundfile as sf
 import os
@@ -209,9 +210,10 @@ if __name__ == '__main__':
     print 'sigValid ', sigValid.shape
     batch=100
     m = kModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
-    # sT=styleTransfer(m,downRate[0],sigArray[:326],sigArray[326:652])
+    sT=styleTransfer(m,downRate[0],sigArray[:326],sigArray[326:652])
     print 'initiated'
-    start(m,downRate[0],sigArray[:326],sigArray[326:652])
+#    pdb.set_trace()
+    start(m,downRate[0],sigArray[:1],sigArray[326:327])
     # sT.run()
-#    m.buildAutoEncoder(True, annotArray)
+#    m.buildAutoEncoder(True,[5],None,annotArray)
 #    m.predict()

@@ -4,7 +4,7 @@ from keras.layers import Input
 from kModel import kModel
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.io import wavfile
-
+import pdb
 
 class Evaluator(object):
     def __init__(self):
@@ -37,17 +37,19 @@ def start(model, sRate, cSignal, sSignal):
     style_w=1.0
     contentSignal=K.variable(shapeArray(cSignal))
     styleSignal=K.variable(shapeArray(sSignal))
-    placeholder=K.placeholder((1,countSamples,1))
+    #placeholder=K.placeholder(np.random.random((1,countSamples,1)))
+    placeholder=K.placeholder((1,cSignal.shape[1],1))
+    pdb.set_trace()
     inputTensor=K.concatenate([contentSignal,styleSignal,placeholder],axis=0)
     kModel=model# this is the object, not the model
     input_au=Input(shape=(3,None,1))#den eimai sigouros
     print '1__'
-    netModel=None
-
 
 #    build()
-    kModel.build(False,inputTensor,input_au)
+    pdb.set_trace()
+    kModel.buildAutoEncoder(False,inputTensor,input_au)
     netModel=kModel.getModel()
+    pdb.set_trace()
     output=dict([(layer.name, layer.output) for layer in netModel.layers])
     print '2__'
     loss=K.variable(0.0)

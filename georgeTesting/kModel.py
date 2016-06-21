@@ -1,9 +1,10 @@
-from keras.layers import Input, Convolution1D, UpSampling1D, AveragePooling1D, MaxPooling1D
+from keras.layers import ZeroPadding1D,Input, Convolution1D, UpSampling1D, AveragePooling1D, MaxPooling1D
 from keras.models import Sequential
 from keras.models import Model
 from keras.optimizers import SGD
 from sklearn.metrics import mean_squared_error
 import numpy as np
+import pdb
 
 class kModel:
     def __init__(self, waves, rate, annotations, validation, vAnnot, vRate):
@@ -22,20 +23,24 @@ class kModel:
             input_au=Input(shape=(self.signals.shape[1], 1))
         else:
             input_au=inputShape
-        print ten.shape
-        firstLayer=Convolution1D(64, 64, activation='relu', border_mode='same',name='conv1')
-        firstLayer.set_input(ten,shape=input_au)
-        self.autoencoder=Sequential()
-        self.autoencoder.add(firstLayer)
-        self.autoencoder.add(AveragePooling1D(pool_length=2, stride=None, border_mode="valid"))
-        self.autoencoder.add(Convolution1D(64, 64, activation='relu', border_mode='same',name='conv2'))
-        self.autoencoder.add(Convolution1D(64, 64, activation='relu', border_mode='same',name='conv3'))
-        self.autoencoder.add(Convolution1D(64,64, activation='relu', border_mode='same',name='conv4'))
-        self.autoencoder.add(UpSampling1D(length=2))
-        self.autoencoder.add(Convolution1D(64,64, activation='relu', border_mode='same',name='conv5'))
-        self.autoencoder.add(Convolution1D(1, 64, activation='relu',border_mode='same'))
-        
+
+ 	input_au=Input(shape=(self.signals.shape[1], 1))
+        x = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv1')(input_au)#16
+        x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(x)
+        x = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv2')(x)#16
+        encoded = Convolution1D(8, 2, activation='relu', border_mode='same',name='conv3')(x)#8
+        encoder = Model(input=input_au, output=encoded)
+
+        x = Convolution1D(8, 2, activation='relu', border_mode='same',name='conv4')(encoded)#8
+        x = UpSampling1D(length=2)(x)
+        x = Convolution1D(16, 2, activation='relu', border_mode='same',name='conv5')(x)#16
+        decoded = Convolution1D(1, 2, activation='relu',border_mode='same')(x)#28
+        self.autoencoder = Model(input_au, decoded)
         self.autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
+
+        
+        #pdb.set_trace()
+#        self.autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
         if target is None:
             target=self.signals
