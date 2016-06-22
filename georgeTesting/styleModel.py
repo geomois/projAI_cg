@@ -22,7 +22,7 @@ def start(model, sRate, cSignal, sSignal):
     noise=np.random.random((1,countSamples,1))
     style_w=1.0
     kModel=model
-    input_au=Input(shape=(countSamples,1))
+    input_au=Input(shape=(None,1))
 #####build
     assert input_au != None , 'oooops'
     kModel.buildAutoEncoder(False,inputShape=input_au)

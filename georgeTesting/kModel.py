@@ -29,7 +29,7 @@ class kModel:
         self.outLayers={}
         encoded1 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv1')(input_au)#16
         self.outLayers['encoder1']=Model(input=input_au,output=encoded1)
-        x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(encoded1)
+        # x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(encoded1)
         encoded2 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv2')(x)#16
         self.outLayers['encoder2'] = Model(input=input_au, output=encoded2)
         encoded3 = Convolution1D(8, 2, activation='relu', border_mode='same',name='conv3')(encoded2)#8
@@ -37,13 +37,14 @@ class kModel:
 
         encoded4 = Convolution1D(8, 2, activation='relu', border_mode='same',name='conv4')(encoded3)#8
         self.outLayers['encoder4']= Model(input=input_au,output=encoded4)
-        x = UpSampling1D(length=2)(encoded4)
+        # x = UpSampling1D(length=2)(encoded4)
         encoded5 = Convolution1D(16, 2, activation='relu', border_mode='same',name='conv5')(x)#16
         self.outLayers['encoder5']=Model(input=input_au,output=encoded5)
-        decoded = Convolution1D(32, 2, activation='relu',border_mode='same')(encoded5)#28
+        decoded = Convolution1D(1, 2, activation='relu',border_mode='same')(encoded5)#28
         self.autoencoder = Model(input_au, decoded)
         self.autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
-
+        self.outLayers={}
+        self.outLayers['auto']=self.autoencoder
         if target is None and train:
             target=self.signals
         if train:
