@@ -15,7 +15,7 @@ def start(model, sRate, cSignal, sSignal):
     content_w=0.025
     style_w = 1.0
     global normRate
-    cSignal,normRate=normalize(shapeArray(cSignal))
+    # cSignal,normRate=normalize(shapeArray(cSignal))
     print 'sRate ', sRate
     print 'cSignal ', cSignal.shape
     print 'sSignal ',sSignal[0].shape

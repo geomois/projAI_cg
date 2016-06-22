@@ -226,7 +226,8 @@ if __name__ == '__main__':
     else:
         print "init"
         m = kModel()
-	start(m, r, contentSignal[:20*r], chunkIt(styleSignal,r))
+        pdb.set_trace()
+        start(m, r, contentSignal[:20*r], chunkIt(styleSignal,r))
 
     # print 'initiated'
 #    pdb.set_trace()
