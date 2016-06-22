@@ -37,15 +37,20 @@ def start(model, sRate, cSignal, sSignal):
     g=[]
     s=[]
     count=0
-    for key in outputLayers:
-        outputLayers[key]=outputLayers['yoLayer']
+    # for key in outputLayers:
+    #     outputLayers[key]=outputLayers['yoLayer']
+    tempC = outputLayers['yoLayer'].predict(cSignal)
+    tempG = outputLayers['yoLayer'](X)
+    c = tempC[0]
+    g = tempG[0]  # K tensor
+    loss+=content_w * contentLoss(c, g)
     for l in outputLayers:
         print count,' ', cSignal.shape, ' ',str(l)
         print 'in shape', outputLayers[l].get_input_shape_at(0)
         print 'out shape', outputLayers[l].get_output_shape_at(0)
-        tempC=outputLayers[l].predict(cSignal)
+        # tempC=outputLayers[l].predict(cSignal)
         tempG=outputLayers[l](X)
-        c=tempC[0]
+        # c=tempC[0]
         g=tempG[0]#K tensor
         sGram=1
         for style in sSignal:
