@@ -22,9 +22,10 @@ def start(model, sRate, cSignal, sSignal):
     noise=np.random.random((1,countSamples,1))
     style_w=1.0
     kModel=model
-    input_au=Input(shape=(3,None,1))
+    input_au=Input(shape=(countSamples,1))
 #####build
-    kModel.buildAutoEncoder(False,input_au)
+    assert input_au != None , 'oooops'
+    kModel.buildAutoEncoder(False,inputShape=input_au)
     netModel,outputLayers=kModel.getModel()
 
     X=Input(shape=(countSamples,1))
@@ -54,7 +55,7 @@ def start(model, sRate, cSignal, sSignal):
     loss *= 10e7
     global gradient_function
     global loss_function
-    gradient_function=T.function([X], T.flatten(T.grad(loss,X)) ,allow_input_downcast=True)
+    gradient_function=T.function([X], T.tensor.flatten(T.grad(loss,X)) ,allow_input_downcast=True)
     loss_function=T.function([X],loss,allow_input_downcast=True)
     global iteration_count
     iteration_count = 0
@@ -83,7 +84,7 @@ def optimization_callback(xk):
 def shapeArray(ar):
     depth=ar.shape[0]
     x=ar.shape[1]
-    return ar.resahpe((1,depth*x,1))
+    return ar.reshape((1,depth*x,1))
 
 def evaluation(x):
     tempX=np.reshape(x, (1, countSamples, 1)).astype(np.float32)
@@ -105,7 +106,7 @@ def styleLoss(style,placehold):
 #   predStyle=netModel.predict(styleSignal) #feature maps
     Sg=style
     Pg=getGram(placehold)
-    return K.sum(K.square(Sg-Pg))/ T.sum(T.square(Sg))
+    return K.sum(K.square(Sg-Pg))/ K.sum(K.square(Sg))
 
 def contentLoss(content,placehold):
     Pg=getGram(placehold)

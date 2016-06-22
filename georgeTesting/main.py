@@ -171,7 +171,7 @@ if __name__ == '__main__':
         styleSignal.append(wav1.reshape((1,len(wav1),1)))
         styleSignal.append(wav2.reshape((1,len(wav2),1)))
         # wav3,r=sf.read("../input/politique.wav")
-        wav3 = sf.read(sys.argv[4])
+        wav3,r = sf.read(sys.argv[4])
         contentSignal=wav3.reshape((1,len(wav3),1))
 
     elif sys.argv[3] == 'read' or sys.argv[3] == 'readValid':
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     else:
         print "init"
         m = kModel()
-        start(m, r, contentSignal, chunkIt(styleSignal,r))
+        start(m, r, contentSignal, chunkIt(styleSignal,r)[0])
 
     # print 'initiated'
 #    pdb.set_trace()

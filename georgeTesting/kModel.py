@@ -21,13 +21,12 @@ class kModel:
 
     # noinspection PyPep8Naming
     def buildAutoEncoder(self,train,inputShape=None,target=None):
-        if inputShape is None:
+      	if inputShape is None:
             input_au=Input(shape=(self.signals.shape[1], 1))
         else:
             input_au=inputShape
 
         self.outLayers={}
-        input_au=Input(shape=(self.signals.shape[1], 1))
         encoded1 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv1')(input_au)#16
         self.outLayers['encoder1']=Model(input=input_au,output=encoded1)
         x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(encoded1)
