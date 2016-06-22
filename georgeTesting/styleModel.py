@@ -37,6 +37,8 @@ def start(model, sRate, cSignal, sSignal):
     g=[]
     s=[]
     count=0
+    for key in outputLayers:
+        outputLayers[key]=outputLayers['yoLayer']
     for l in outputLayers:
         print count,' ', cSignal.shape, ' ',str(l)
         print 'in shape', outputLayers[l].get_input_shape_at(0)

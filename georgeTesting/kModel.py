@@ -21,7 +21,7 @@ class kModel:
 
     # noinspection PyPep8Naming
     def buildAutoEncoder(self,train,inputShape=None,target=None):
-      	if inputShape is None:
+        if inputShape is None:
             input_au=Input(shape=(self.signals.shape[1], 1))
         else:
             input_au=inputShape
