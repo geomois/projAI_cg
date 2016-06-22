@@ -13,17 +13,16 @@ def start(model, sRate, cSignal, sSignal):
     global sampleRate
     sampleRate=sRate
     content_w=0.025
+    style_w = 1.0
     global normRate
     cSignal,normRate=normalize(shapeArray(cSignal))
     print 'sRate ', sRate
     print 'cSignal ', cSignal.shape
     print 'sSignal ',sSignal[0].shape
-    pdb.set_trace()
+    #pdb.set_trace()
     global countSamples
     countSamples=cSignal.shape[1]
-    #noise=np.random.random((1,countSamples,1))
-    
-    style_w=1.0
+    noise=np.random.random((1,countSamples,1))
     kModel=model
     input_au=Input(shape=(None,1))
 #####build
@@ -76,7 +75,7 @@ def start(model, sRate, cSignal, sSignal):
     print("optimizing")
     #pdb.set_trace()
     opt, Vn, info = fmin_l_bfgs_b(
-        evaluation,cSignal.astype(np.float64).flatten(),bounds=bounds,factr=0.0, pgtol=0.0,maxfun=30000,  # Limit number of calls to evaluate().
+        evaluation,noise.astype(np.float64).flatten(),bounds=bounds,factr=0.0, pgtol=0.0,maxfun=30000,  # Limit number of calls to evaluate().
         iprint=1,approx_grad=False,callback=optimization_callback)
     print opt.shape
     sf.write('../outFiles/output.wav', opt.astype(np.float32),sRate)
