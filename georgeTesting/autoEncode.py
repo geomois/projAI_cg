@@ -209,7 +209,7 @@ if __name__ == '__main__':
     print 'sigValid ', sigValid.shape
     batch=100
     
-    m = kerasModel(sigArray,annotArray,sigValid,annotValid)    
+    #m = kerasModel(sigArray,annotArray,sigValid,annotValid)    
     """
     m.buildAutoEncoder(32,2,'mean_squared_error','adadelta','relu')
     m.autoEncoderTrain(annotArray,10,128,'ae_weights.w_relu')    
@@ -227,8 +227,13 @@ if __name__ == '__main__':
     m.buildAutoEncoder(32,100,'mean_squared_error','adadelta',LeakyRelu(alpha=1.0))
     m.autoEncoderTrain(annotArray,25,128,'ae_weights_len100_elu.w')
     """
+    """
     m.buildAutoEncoder(32,128,'mean_squared_error','adadelta','relu')
     m.autoEncoderTrain(annotArray,25,128,'ae_weights_256len128.w')
-    
+    """
     #m.loadWeights('ae_weights_len100_elu.w')
-
+    from kModel import kModel
+    m=kModel(sigArray,0,annotArray,sigValid,annotValid,0)
+    from keras import backend as K
+    m.buildAutoEncoder(1,K.placeholder((1,sigArray.shape[1],1)))
+    
