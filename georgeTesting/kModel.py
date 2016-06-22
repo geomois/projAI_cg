@@ -43,23 +43,6 @@ class kModel:
         decoded = Convolution1D(32, 2, activation='relu',border_mode='same')(encoded5)#28
         self.autoencoder = Model(input_au, decoded)
         self.autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
-        #pdb.set_trace()
-#        self.autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
-        # self.get_activations1 = theano.function([encoder.get], self.autoencoder.layers[1].output(train=False),
-        #                                   allow_input_downcast=True)
-
-        # self.get_activations2 = theano.function([self.autoencoder.layers[2].input],
-        #                                    self.autoencoder.layers[3].output(train=False),
-        #                                    allow_input_downcast=True)
-        # self.get_activations3 = theano.function([self.autoencoder.layers[3].input],
-        #                                    self.autoencoder.layers[4].output(train=False),
-        #                                    allow_input_downcast=True)
-        # self.get_activations4 = theano.function([self.autoencoder.layers[4].input],
-        #                                    self.autoencoder.layers[5].output(train=False),
-        #                                    allow_input_downcast=True)
-        # self.get_activations5 = theano.function([self.autoencoder.layers[5].input],
-        #                                    self.autoencoder.layers[6].output(train=False),
-        #                                    allow_input_downcast=True)
 
         if target is None:
             target=self.signals

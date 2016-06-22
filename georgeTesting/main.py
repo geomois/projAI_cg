@@ -212,6 +212,6 @@ if __name__ == '__main__':
     print 'initiated'
 #    pdb.set_trace()
 #    start(m,downRate[0],np.hstack((sigArray[:1],sigArray[2:3])),[sigArray[326:327],sigArray[327:328]])
-    start(m,downRate[0],sigArray[:1],[sigArray[326:327],sigArray[327:328]])
+    start(m,downRate[0],sigArray[:20],[sigArray[326:327],sigArray[327:328]])
 #    m.buildAutoEncoder(True,None,annotArray)
 #    m.predict()

@@ -5,32 +5,15 @@ from keras.layers import Input
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.io import wavfile
 import theano as T
+from utils import *
+import soundfile as sf
 import pdb
 
-class Evaluator(object):
-    def __init__(self):
-        self.loss_value = None
-        self.grads_values = None
-
-    def loss(self, x):
-        assert self.loss_value is None
-        loss_value, grad_values = evaluation(x)
-        self.loss_value = loss_value
-        self.grad_values = grad_values
-        return self.loss_value
-
-    def grads(self, x):
-        assert self.loss_value is not None
-        grad_values = np.copy(self.grad_values)
-        self.loss_value = None
-        self.grad_values = None
-        return grad_values
-
-#global gradient_function
-#global loss_function
 def start(model, sRate, cSignal, sSignal):
     sampleRate=sRate
     content_w=0.025
+    global normRate
+    cSignal,normRate=normalize(shapeArray(cSignal))
     print 'sRate ', sRate
     print 'cSignal ', cSignal.shape
     print 'sSignal ',sSignal[0].shape
@@ -38,34 +21,11 @@ def start(model, sRate, cSignal, sSignal):
     countSamples=cSignal.shape[1]
     noise=np.random.random((1,countSamples,1))
     style_w=1.0
-    #contentSignal=K.variable(shapeArray(cSignal))
-   # styleSignal=K.variable(shapeArray(sSignal))
-    #placeholder=K.placeholder(np.random.random((1,countSamples,1)))
-    #placeholder=K.placeholder((1,cSignal.shape[1],1))
-    #inputTensor=K.concatenate([contentSignal,styleSignal,placeholder],axis=0)
-    kModel=model# this is the object, not the model
-    input_au=Input(shape=(3,None,1))#den eimai sigouros
-
-#    build()
+    kModel=model
+    input_au=Input(shape=(3,None,1))
+#####build
     kModel.buildAutoEncoder(False,input_au)
     netModel,outputLayers=kModel.getModel()
-    output={}#dict(c[(layer.name, layer.output) for layer in netModel.layers])
-    # output['conv1']=kModel.get_activations1(inputTensor)
-    # output['conv2'] = kModel.get_activations2(inputTensor)
-    # output['conv3'] = kModel.get_activations3(inputTensor)
-    # output['conv4'] = kModel.get_activations4(inputTensor)
-    # output['conv5'] = kModel.get_activations5(inputTensor)
-
-    # for key in outputLayers:
-    #     outputLayers[key].predict_on_batch()
-
-    # loss=K.variable(0.0)
-    # pdb.set_trace() #check output shape
-    # fMap=outputLayers['encoder1'].predict_on_batch(cSignal)
-
-    # contentFMap=fMap[0,:,:]
-    # placeholderFMap=fMap[2,:,:]
-    # loss+=content_w*contentLoss(contentFMap,placeholderFMap)
 
     X=Input(shape=(countSamples,1))
     loss=0
@@ -80,49 +40,49 @@ def start(model, sRate, cSignal, sSignal):
         tempC=outputLayers[l].predict(cSignal)
         tempG=outputLayers[l](X)
         c=tempC[0]
-        g=tempG[0]#tensor
+        g=tempG[0]#K tensor
         sGram=1
         for style in sSignal:
             tempS=outputLayers[l].predict(style)
             s=tempS[0]
             sGram*=getGram(s)/style.shape[1]
         sGram**=1.0/len(sSignal) #sSignal sould be a list
-        loss+=style_w * styleLoss(sGram,g)
+
+        loss+=style_w * styleLoss(sGram,g) +content_w * contentLoss(c,g)
         count+=1
+
+    loss *= 10e7
     global gradient_function
     global loss_function
-    gradient_function=T.function([X], K.flatten(K.gradients(loss,X)) ,allow_input_downcast=True)
+    gradient_function=T.function([X], T.flatten(T.grad(loss,X)) ,allow_input_downcast=True)
     loss_function=T.function([X],loss,allow_input_downcast=True)
     global iteration_count
     iteration_count = 0
-    bounds = [[-0.9, 0.9]]
+
+    bounds = [[-1.0, 1.0]]
     bounds = np.repeat(bounds, countSamples, axis=0)
 
     print("optimizing")
     pdb.set_trace()
     opt, Vn, info = fmin_l_bfgs_b(
-        evaluation,
-        noise.astype(np.float64).flatten(),
-        bounds=bounds,
-        factr=0.0, pgtol=0.0,
-        maxfun=30000,  # Limit number of calls to evaluate().
-        iprint=1,
-        approx_grad=False,
-        callback=optimization_callback)
+        evaluation,noise.astype(np.float64).flatten(),bounds=bounds,factr=0.0, pgtol=0.0,maxfun=30000,  # Limit number of calls to evaluate().
+        iprint=1,approx_grad=False,callback=optimization_callback)
 
-    wavfile.write('../outFiles/output.wav', countSamples, opt.astype(np.int16))
+    sf.write('../outFiles/output.wav', opt.astype(np.float32), countSamples)
     print("done.")
 
 def optimization_callback(xk):
     global iteration_count
-    
     if iteration_count % 10 == 0:
         current_x = np.copy(xk)
+        current_x=unNorm(current_x,normRate)
         wavfile.write('../outFiles/iter/output%d.wav' % iteration_count, countSamples, current_x.astype(np.int16))
     iteration_count += 1
 
 def shapeArray(ar):
-    return ar
+    depth=ar.shape[0]
+    x=ar.shape[1]
+    return ar.resahpe((1,depth*x,1))
 
 def evaluation(x):
     tempX=np.reshape(x, (1, countSamples, 1)).astype(np.float32)
@@ -132,7 +92,7 @@ def evaluation(x):
 
 
 def getGram(matrix):
-#    assert K.ndim(matrix) == 2 , "gram ndim not 2"
+#    assert K.ndim(matrix) == 3 , "gram ndim not 3"
     gram=K.dot(matrix.T,matrix)
     return gram
 #        features = K.batch_flatten(x)
@@ -141,10 +101,10 @@ def getGram(matrix):
 def styleLoss(style,placehold):
  #   assert K.ndim(style)==2 ,"style ndim not 2"
   #  assert K.ndim(placehold==2), "placeholder ndim not 2"
-#        predStyle=netModel.predict(styleSignal) #feature maps
+#   predStyle=netModel.predict(styleSignal) #feature maps
     Sg=style
     Pg=getGram(placehold)
-    return K.sum(K.square(Sg-Pg))/ K.sum(K.square(Sg)) #may be Sg-Pg
+    return K.sum(K.square(Sg-Pg))/ T.sum(T.square(Sg))
 
 def contentLoss(content,placehold):
     Pg=getGram(placehold)
