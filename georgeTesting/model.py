@@ -49,10 +49,10 @@ class kerasModel:
         print 'Training..'
 	target=target[:,0:13208]
 	#history=callbacks.History()
-	earlystop=callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=0, mode='auto')
+	#earlystop=callbacks.EarlyStopping(monitor='val_loss', patience=5, verbose=0, mode='auto')
         #checkpoint=callbacks.ModelCheckpoint(name, monitor='val_loss', verbose=0, save_best_only=True, mode='auto')
 	print("in train",self.signals.shape,target.shape)
-	self.autoencoder.fit(self.signals, target, nb_epoch=epochs, batch_size=batch, shuffle=True, callbacks=[earlystop], validation_data=(self.validation, self.validAnnotation))	
+	self.autoencoder.fit(self.signals, target, nb_epoch=epochs, batch_size=batch, shuffle=True, callbacks=[], validation_data=(self.validation, self.validAnnotation))	
         self.autoencoder.save_weights(name, True)
 	
     def loadWeights(self,name):
