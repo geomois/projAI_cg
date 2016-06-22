@@ -76,7 +76,7 @@ def start(model, sRate, cSignal, sSignal):
     print("optimizing")
     #pdb.set_trace()
     opt, Vn, info = fmin_l_bfgs_b(
-        evaluation,noise.astype(np.float64).flatten(),bounds=bounds,factr=0.0, pgtol=0.0,maxfun=30000,  # Limit number of calls to evaluate().
+        evaluation,cSignal.astype(np.float64).flatten(),bounds=bounds,factr=0.0, pgtol=0.0,maxfun=30000,  # Limit number of calls to evaluate().
         iprint=1,approx_grad=False,callback=optimization_callback)
     print opt.shape
     sf.write('../outFiles/output.wav', opt.astype(np.float32),sRate)
