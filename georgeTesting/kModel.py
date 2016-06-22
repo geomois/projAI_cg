@@ -27,32 +27,33 @@ class kModel:
             input_au=inputShape
 
         self.outLayers={}
-        encoded1 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv1')(input_au)#16
+        encoded1 = Convolution1D(32, 128, activation='relu', border_mode='same',name='conv1')(input_au)#16
         self.outLayers['encoder1']=Model(input=input_au,output=encoded1)
         # x = AveragePooling1D(pool_length=2, stride=None, border_mode="valid")(encoded1)
-        encoded2 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv2')(encoded1)#16
+        encoded2 = Convolution1D(32, 128, activation='relu', border_mode='same',name='conv2')(encoded1)#16
         self.outLayers['encoder2'] = Model(input=input_au, output=encoded2)
-        encoded3 = Convolution1D(8, 2, activation='relu', border_mode='same',name='conv3')(encoded2)#8
+        encoded3 = Convolution1D(8, 128, activation='relu', border_mode='same',name='conv3')(encoded2)#8
         self.outLayers['encoder3']= Model(input=input_au, output=encoded3)
-
-        encoded4 = Convolution1D(8, 2, activation='relu', border_mode='same',name='conv4')(encoded3)#8
-        self.outLayers['encoder4']= Model(input=input_au,output=encoded4)
+        yoLayer=Convolution1D(1, 128, activation='relu', border_mode='same',name='conv3')(encoded2)
+        self.outLayers['yoLayer']=Model(input=input_au, output=yoLayer)
+        encoded4 = Convolution1D(8, 128, activation='relu', border_mode='same',name='conv4')(yoLayer)#8
+  #      self.outLayers['encoder4']= Model(input=input_au,output=encoded4)
         # x = UpSampling1D(length=2)(encoded4)
-        encoded5 = Convolution1D(16, 2, activation='relu', border_mode='same',name='conv5')(encoded4)#16
-        self.outLayers['encoder5']=Model(input=input_au,output=encoded5)
-        decoded = Convolution1D(1, 2, activation='relu',border_mode='same')(encoded5)#28
+        encoded5 = Convolution1D(16, 128, activation='relu', border_mode='same',name='conv5')(encoded4)#16
+ #       self.outLayers['encoder5']=Model(input=input_au,output=encoded5)
+        decoded = Convolution1D(1, 128, activation='relu',border_mode='same')(encoded5)#28
         self.autoencoder = Model(input_au, decoded)
         self.autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
-        self.outLayers={}
-        self.outLayers['auto']=self.autoencoder
+#        self.outLayers={}
+#        self.outLayers['auto']=self.autoencoder
         if target is None and train:
             target=self.signals
         if train:
             print 'Training..'
-            self.autoencoder.fit(self.signals, target, nb_epoch=15, batch_size=64, shuffle=True, callbacks=[])
-            self.autoencoder.save_weights("kModel_weights.w", True)
+            self.autoencoder.fit(self.signals, target, nb_epoch=5, batch_size=64, shuffle=True, callbacks=[])
+            self.autoencoder.save_weights("kModel_weights_yo.w", True)
         else:
-            self.autoencoder.load_weights('kModel_weights.w')
+            self.autoencoder.load_weights('kModel_weights_yo.w')
         print 'done'
 
     def predict(self):

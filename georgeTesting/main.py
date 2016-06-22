@@ -11,6 +11,7 @@ from monoPipeline import MyAudio
 import gzip
 from styleModel import *
 import pdb
+from normalize import *
 
 def prepareAudio(directory, size=1):
     oggs = []
@@ -219,12 +220,13 @@ if __name__ == '__main__':
         print 'annotValid ', annotValid.shape
         print 'sigValid ', sigValid.shape
         batch = 100
-        m = kModel(sigArray, downRate, annotArray, sigValid[:batch], annotValid[:batch], validRate)
-        start(m, downRate[0], np.hstack((sigArray[:1], sigArray[2:3])), [sigArray[326:327], sigArray[327:328]])
+        m = kModel(normalize(sigArray)[0],downRate,annotArray, normalize(sigValid[:batch])[0], annotValid[:batch], validRate)
+        m.buildAutoEncoder(True,None,annotArray)
+	#start(m, downRate[0], np.hstack((sigArray[:1], sigArray[2:3])), [sigArray[326:327], sigArray[327:328]])
     else:
         print "init"
         m = kModel()
-        start(m, r, contentSignal, chunkIt(styleSignal,r)[0])
+        start(m, r, contentSignal[:20*r], chunkIt(styleSignal,r)[0])
 
     # print 'initiated'
 #    pdb.set_trace()
