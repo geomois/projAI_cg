@@ -39,11 +39,12 @@ def start(model, sRate, cSignal, sSignal):
     count=0
     # for key in outputLayers:
     #     outputLayers[key]=outputLayers['yoLayer']
-    tempC = outputLayers['yoLayer'].predict(cSignal)
-    tempG = outputLayers['yoLayer'](X)
+    tempC = outputLayers['encoder1'].predict(cSignal)
+    tempG = outputLayers['encoder1'](X)
     c = tempC[0]
     g = tempG[0]  # K tensor
     loss+=content_w * contentLoss(c, g)
+    #outputLayers.pop('yoLayer',None)
     for l in outputLayers:
         print count,' ', cSignal.shape, ' ',str(l)
         print 'in shape', outputLayers[l].get_input_shape_at(0)
@@ -58,8 +59,9 @@ def start(model, sRate, cSignal, sSignal):
             s=tempS[0]
             sGram*=getGram(s)/style.shape[1]
         sGram**=1.0/len(sSignal) #sSignal sould be a list
+        gGram=getGram(g)/countSamples
 
-        loss+=style_w * styleLoss(sGram,g)# +content_w * contentLoss(c,g)
+        loss+=style_w * styleLoss(sGram,gGram)# +content_w * contentLoss(c,g)
         count+=1
 
     loss *= 10e7
@@ -79,7 +81,7 @@ def start(model, sRate, cSignal, sSignal):
         evaluation,cSignal.astype(np.float64).flatten(),bounds=bounds,factr=0.0, pgtol=0.0,maxfun=30000,  # Limit number of calls to evaluate().
         iprint=1,approx_grad=False,callback=optimization_callback)
     print opt.shape
-    sf.write('../outFiles/output.wav', opt.astype(np.float32),sRate)
+    sf.write('../outFiles/3exwra.wav', opt.astype(np.float32),sRate)
     print("done.")
 
 def optimization_callback(xk):
@@ -88,7 +90,7 @@ def optimization_callback(xk):
         current_x = np.copy(xk)
 #        print current_x.shape
 #        current_x=denormalize(current_x,normRate)
-        sf.write('../outFiles/iter/output%d.wav' % iteration_count, current_x.astype(np.float32),sampleRate)
+        sf.write('../outFiles/iter/3exwra%d.wav' % iteration_count, current_x.astype(np.float32),sampleRate)
     iteration_count += 1
 
 def shapeArray(ar):
@@ -115,7 +117,7 @@ def styleLoss(style,placehold):
   #  assert K.ndim(placehold==2), "placeholder ndim not 2"
 #   predStyle=netModel.predict(styleSignal) #feature maps
     Sg=style
-    Pg=getGram(placehold)
+    Pg=placehold
     return K.sum(K.square(Sg-Pg))/ K.sum(K.square(Sg))
 
 def contentLoss(content,placehold):
