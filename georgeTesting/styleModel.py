@@ -22,6 +22,7 @@ def start(model, sRate, cSignal, sSignal):
     #pdb.set_trace()
     global countSamples
     countSamples=cSignal.shape[1]
+
     noise=np.random.random((1,countSamples,1))
     kModel=model
     input_au=Input(shape=(None,1))
