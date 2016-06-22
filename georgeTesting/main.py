@@ -1,4 +1,5 @@
 # call: python <scriptName> <trainFiles directory> <annotations directory> <read> or <write> or <wav> or <simple> <number of files to read>
+import pdb
 import numpy as np
 import soundfile as sf
 import os
@@ -8,7 +9,8 @@ import scipy.signal as signal
 import pickle
 from monoPipeline import MyAudio
 import gzip
-from styleModel import styleTransfer
+from styleModel import *
+import pdb
 
 def prepareAudio(directory, size=1):
     oggs = []
@@ -167,7 +169,6 @@ if __name__ == '__main__':
             validSignals, validRate, validPaths = prepareAudio('../resampledValid/', 100)
             annotations = readAnnotations(sys.argv[2], validPaths)
             validAnnotWave = prepareAnnotations(validSignals, validRate, annotations)
-
     elif sys.argv[3] == 'write':
         waves, rate, paths = prepareAudio(sys.argv[1], int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
@@ -186,7 +187,6 @@ if __name__ == '__main__':
         #     tempSignals, downRate = downSample(tempWaves, rate)
         #     signals.extend(tempSignals)
         #     del waves[0:2]
-
         annotationWave = prepareAnnotations(signals, downRate, annotations)
         toWav(signals, downRate, paths)
         print 'done saving'
@@ -209,8 +209,9 @@ if __name__ == '__main__':
     print 'sigValid ', sigValid.shape
     batch=100
     m = kModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
-    sT=styleTransfer(m,downRate[0],sigArray[:326],sigArray[326:652])
     print 'initiated'
-    sT.run()
-#    m.buildAutoEncoder(True, annotArray)
+#    pdb.set_trace()
+#    start(m,downRate[0],np.hstack((sigArray[:1],sigArray[2:3])),[sigArray[326:327],sigArray[327:328]])
+    start(m,downRate[0],sigArray[:1],[sigArray[326:327],sigArray[327:328]])
+#    m.buildAutoEncoder(True,None,annotArray)
 #    m.predict()
