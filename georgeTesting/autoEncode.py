@@ -237,7 +237,18 @@ if __name__ == '__main__':
     m.loadWeights('aw_weights_64_8len128_adadelta_relu.w')
     m.evaluate()    
     """
+    """
     m.buildAutoEncoder(32,2)
     m.autoEncoderTrain(annotArray,20,128,'weights32_2_bce_adadelta_relu.w')
     #m.loadWeights('weights32_2_bce_adadelta_relu.w')
     m.evaluate() #gives 50% accuracy
+    """
+    from normalize import normalize
+    sigArray=normalize(sigArray)[0]
+    annotArray=normalize(annotArray)[0]
+    sigValid=normalize(sigValid)[0]
+    annotValid=normalize(annotValid)[0]
+    m = kerasModel(sigArray,annotArray,sigValid,annotValid)    
+    m.buildAutoEncoder(32,128)
+    m.autoEncoderTrain(annotArray,20,128,'weights32_128_bce_adadelta_relu_norm.w')
+    m.evaluate() 
