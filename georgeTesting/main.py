@@ -222,12 +222,13 @@ if __name__ == '__main__':
         m = kModel(sigArray, downRate, annotArray, sigValid[:batch], annotValid[:batch], validRate)
         start(m, downRate[0], np.hstack((sigArray[:1], sigArray[2:3])), [sigArray[326:327], sigArray[327:328]])
     else:
+        print "init"
         m = kModel()
-        start(m, downRate[0], contentSignal, styleSignal)
+        start(m, r, contentSignal, chunkIt(styleSignal,r))
 
-    print 'initiated'
+    # print 'initiated'
 #    pdb.set_trace()
 #    start(m,downRate[0],np.hstack((sigArray[:1],sigArray[2:3])),[sigArray[326:327],sigArray[327:328]])
-    start(m,downRate[0],sigArray[:20],styleSignal)
+#     start(m,downRate[0],sigArray[:20],styleSignal)
 #    m.buildAutoEncoder(True,None,annotArray)
 #    m.predict()
