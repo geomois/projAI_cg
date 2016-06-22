@@ -5,7 +5,7 @@ from keras.layers import Input
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.io import wavfile
 import theano as T
-from utils import *
+from normalize import *
 import soundfile as sf
 import pdb
 
@@ -75,7 +75,8 @@ def optimization_callback(xk):
     global iteration_count
     if iteration_count % 10 == 0:
         current_x = np.copy(xk)
-        current_x=unNorm(current_x,normRate)
+        print current_x.shape
+        current_x=denormalize(current_x,normRate)
         wavfile.write('../outFiles/iter/output%d.wav' % iteration_count, countSamples, current_x.astype(np.int16))
     iteration_count += 1
 

@@ -160,8 +160,21 @@ def prepareForKeras(downRate,signals,annotationWave):
 
 
 if __name__ == '__main__':
-    simpleRun = False
-    if sys.argv[3] == 'read' or sys.argv[3] == 'readValid':
+    simpleRun = True
+    if sys.argv[1]=='style':
+        simpleRun=False
+        styleSignal=[]
+        # wav1,r=sf.read('../input/obama.wav')
+        # wav2, r = sf.read('../input/french.wav')
+        wav1, r = sf.read(sys.argv[2])
+        wav2, r = sf.read(sys.argv[3])
+        styleSignal.append(wav1.reshape((1,len(wav1),1)))
+        styleSignal.append(wav2.reshape((1,len(wav2),1)))
+        # wav3,r=sf.read("../input/politique.wav")
+        wav3 = sf.read(sys.argv[4])
+        contentSignal=wav3.reshape((1,len(wav3),1))
+
+    elif sys.argv[3] == 'read' or sys.argv[3] == 'readValid':
         signals, downRate, paths=prepareAudio('../resampled/', 100)
         annotations = readAnnotations(sys.argv[2], paths)
         annotationWave=prepareAnnotations(signals, downRate, annotations)
@@ -191,27 +204,30 @@ if __name__ == '__main__':
         toWav(signals, downRate, paths)
         print 'done saving'
     else:
-        simpleRun = True
-
-    if simpleRun:
         print 'simpleRun'
         waves, rate, paths = prepareAudio(sys.argv[1], int(sys.argv[4]))
         annotations = readAnnotations(sys.argv[2], paths)
         signals, downRate = downSample(waves, rate, None)
         annotationWave = prepareAnnotations(signals, downRate, annotations)
 
-    annotArray,sigArray=prepareForKeras(downRate,signals,annotationWave)
-    annotValid,sigValid=prepareForKeras(validRate,validSignals,validAnnotWave)
-    
-    print "annotTrain ", annotArray.shape
-    print "sigTrain ", sigArray.shape
-    print 'annotValid ', annotValid.shape
-    print 'sigValid ', sigValid.shape
-    batch=100
-    m = kModel(sigArray, downRate,annotArray,sigValid[:batch],annotValid[:batch],validRate)
+    if simpleRun:
+        annotArray, sigArray = prepareForKeras(downRate, signals, annotationWave)
+        annotValid, sigValid = prepareForKeras(validRate, validSignals, validAnnotWave)
+
+        print "annotTrain ", annotArray.shape
+        print "sigTrain ", sigArray.shape
+        print 'annotValid ', annotValid.shape
+        print 'sigValid ', sigValid.shape
+        batch = 100
+        m = kModel(sigArray, downRate, annotArray, sigValid[:batch], annotValid[:batch], validRate)
+        start(m, downRate[0], np.hstack((sigArray[:1], sigArray[2:3])), [sigArray[326:327], sigArray[327:328]])
+    else:
+        m = kModel()
+        start(m, downRate[0], contentSignal, styleSignal)
+
     print 'initiated'
 #    pdb.set_trace()
 #    start(m,downRate[0],np.hstack((sigArray[:1],sigArray[2:3])),[sigArray[326:327],sigArray[327:328]])
-    start(m,downRate[0],sigArray[:20],[sigArray[326:327],sigArray[327:328]])
+    start(m,downRate[0],sigArray[:20],styleSignal)
 #    m.buildAutoEncoder(True,None,annotArray)
 #    m.predict()

@@ -9,7 +9,7 @@ import theano
 
 
 class kModel:
-    def __init__(self, waves, rate, annotations, validation, vAnnot, vRate):
+    def __init__(self, waves=None, rate=None, annotations=None, validation=None, vAnnot=None, vRate=None):
         self.data = []
         self.signals=waves
         self.rate=rate
@@ -25,6 +25,7 @@ class kModel:
             input_au=Input(shape=(self.signals.shape[1], 1))
         else:
             input_au=inputShape
+
         self.outLayers={}
         input_au=Input(shape=(self.signals.shape[1], 1))
         encoded1 = Convolution1D(32, 2, activation='relu', border_mode='same',name='conv1')(input_au)#16
@@ -44,7 +45,7 @@ class kModel:
         self.autoencoder = Model(input_au, decoded)
         self.autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
 
-        if target is None:
+        if target is None and train:
             target=self.signals
         if train:
             print 'Training..'
@@ -53,6 +54,7 @@ class kModel:
         else:
             self.autoencoder.load_weights('kModel_weights.w')
         print 'done'
+
     def predict(self):
         self.buildAutoEncoder(False)
         predictions = self.autoencoder.predict_on_batch(self.validation)
