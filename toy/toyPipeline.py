@@ -9,11 +9,6 @@ class MyAudio:
 		self.audio_sample_freq=audio_sample_freq
 		self.audio=audio
 
-		self.audio_duration=self.audio.shape[0]/self.audio_sample_freq
-		print "audio duration ", self.audio_duration#, " real duration ", str(984)
-
-		self.chunk_duration=1 # in seconds
-
 	def downsample(self):
         	double_b=440*2
         	#the audio has 441000 samples per sec but we want to downsample
@@ -21,13 +16,15 @@ class MyAudio:
 
         	step=self.audio_sample_freq/double_b
         	self.downsampled_audio=signal.decimate(self.audio,step)
+		self.downsampled_audio=self.downsampled_audio[0:880000]
 		self.new_sample_rate=double_b
 
 		maxAmp=np.max(np.abs(self.downsampled_audio))
 		self.downsampled_audio=self.downsampled_audio/maxAmp
 
+		print "after normal...min,max=",np.min(self.downsampled_audio),np.max(self.downsampled_audio)
 		self.audio=self.downsampled_audio
-        	return self.downsampled_audio,double_b,maxAmp
+        	return self.downsampled_audio,self.new_sample_rate,maxAmp
 
 	def split(self):
         	samples_in_chunk=self.new_sample_rate
@@ -42,12 +39,6 @@ class MyAudio:
                 	chunk = self.audio[start_pos : end_pos]
                 	if chunk.shape[0]<samples_in_chunk:
                         	chunk=np.append(chunk,np.zeros(samples_in_chunk-len(chunk)))#make for channels
-                	"""
-			if write_files==True:
-                        	wavfile.write("created/"+str(c)+".wav",samples_in_chunk/chunk_duration, chunk)
-			c = c + 1
-                	#print "wrote file: ", str(c)+".wav"
-			"""
                 	self.chunks.append(chunk)
         	return self.chunks
 
@@ -58,5 +49,5 @@ class MyAudio:
 		self.input_matrix=np.zeros(shape=(matrix_height,matrix_width))
         	for i,chunk in enumerate(self.chunks):
 	                self.input_matrix[i,:]=self.chunks[i][0:matrix_width]
-       		print "inp matr shap ",self.input_matrix.shape
+       		print "input matrix shape ",self.input_matrix.shape
         	return self.input_matrix

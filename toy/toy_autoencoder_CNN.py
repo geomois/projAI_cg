@@ -10,13 +10,37 @@ from sklearn.metrics import mean_squared_error
 import os
 import matplotlib.pyplot as plt
 
-
 from toyPipeline import MyAudio
+
+def plot(before,after):
+        plt.figure()
+        l=before.shape[0]*before.shape[1]
+        f=before.reshape(l)
+	print "f: ",f
+        plt.subplot(2, 1, 1)
+        plt.plot(np.linspace(0,l,l),f)
+        plt.subplot(2,1,2)
+        f=after.reshape(l)
+        print "f: ",f
+        plt.plot(np.linspace(0,l,l),f)
+        plt.show()
+
+def tofile(predictions,rate,name):
+        signal=np.array([])
+        for i in predictions:
+                i=np.resize(i,i.shape[0])
+                signal=np.concatenate((signal,i))
+	signal=np.asarray(signal)
+        print "signal ",signal	
+	print "shape ",signal.shape
+        wavfile.write(name,rate,signal)
+
+
 sr,au=wavfile.read('toy_data_sines_44_1khz.wav')
 data=MyAudio(sr,au,1)
 norm_downsampled_data,sample_freq,maxamp=data.downsample()#makes normalization as well
 
-audio_chunks_of1sec = data.split()
+data.split()
 data_input=data.getInputMatrix()
 
 input_img = Input(shape=(880,1))
@@ -40,42 +64,21 @@ autoencoder.compile(optimizer='rmsprop', loss='mse')
 
 x_train = np.reshape(data_input, (data_input.shape[0], data_input.shape[1],1))
 
-l=int(x_train.shape[0]*0.3)
-x_test=x_train[0:l]
-x_train=x_train[l:]
+split=int(x_train.shape[0]*0.3)
+x_test=x_train[0:split]
+x_train=x_train[split:]
 
 #autoencoder.fit(x_train, x_train, nb_epoch=20,batch_size=128,shuffle=True,validation_data=(x_test, x_test),callbacks=[])
-#autoencoder.save_weights('toyCNN.w')
+#autoencoder.save_weights('toyCNN.w',overwrite=True)
 autoencoder.load_weights('toyCNN.w')
 
-pred=autoencoder.predict(x_test)
+predictions=autoencoder.predict(x_test)
 
 denorm_x=x_test*maxamp
-denorm_pred=pred*maxamp
+denorm_predictions=predictions*maxamp
 
-def tofile(predictions,rate,name):
-	signal=np.array([])
-	for i in predictions:
-		i=np.resize(i,i.shape[0])	
-		signal=np.concatenate((signal,i))
+tofile(denorm_x,880,'toyforprediction.wav')
+tofile(denorm_predictions,880,'toyprediction.wav')
 
-	print "signal",signal.shape
-	signal=np.asarray(signal, dtype=np.int16)
-	wavfile.write(name,sample_freq,signal)
+plot(x_test[0:20],predictions[0:20])
 
-#tofile(denorm_x,sample_freq,'toyforprediction.wav')
-#tofile(denorm_pred,sample_freq,'toyprediction.wav')
-
-def plot(before,after):
-	from scipy.fftpack import fft, ifft
-	plt.figure()
-        l=before.shape[0]*before.shape[1]
-	f=before.reshape(l)
-	plt.subplot(2, 1, 1)
-	plt.plot(np.linspace(0,l,l),f)
-	plt.subplot(2,1,2)
-	f=after.reshape(l)
-	plt.plot(np.linspace(0,l,l),f)
-	plt.show()
-
-plot(x_test[0:5],pred[0:5])
