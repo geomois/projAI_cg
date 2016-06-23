@@ -13,23 +13,24 @@ class MyAudio:
 		print "audio duration ", self.audio_duration#, " real duration ", str(984)
 
 		self.chunk_duration=1 # in seconds
-		print "arxika audio shape ", audio.shape
 
 	def downsample(self):
         	double_b=440*2
         	#the audio has 441000 samples per sec but we want to downsample
         	#i.e. to have 880 samples per sec so we will decimate every 441000/880
 
-        	#test how many channels
-        	print "audio shape ", self.audio.shape
         	step=self.audio_sample_freq/double_b
-        	print "step ", step
         	self.downsampled_audio=signal.decimate(self.audio,step)
-        	return self.downsampled_audio,step
+		self.new_sample_rate=double_b
+
+		maxAmp=np.max(np.abs(self.downsampled_audio))
+		self.downsampled_audio=self.downsampled_audio/maxAmp
+
+		self.audio=self.downsampled_audio
+        	return self.downsampled_audio,double_b,maxAmp
 
 	def split(self):
-        	samples_in_chunk=self.audio_sample_freq#WE NOW RECEIVE THE ALREADY DOWNSAMPLED(and since we split in 1 sec it's that rate)
-		print "samples in chunk ", samples_in_chunk
+        	samples_in_chunk=self.new_sample_rate
 
         	c=1
 		self.chunks=[]
@@ -48,7 +49,6 @@ class MyAudio:
                 	#print "wrote file: ", str(c)+".wav"
 			"""
                 	self.chunks.append(chunk)
-			
         	return self.chunks
 
 	def getInputMatrix(self):
@@ -60,4 +60,3 @@ class MyAudio:
 	                self.input_matrix[i,:]=self.chunks[i][0:matrix_width]
        		print "inp matr shap ",self.input_matrix.shape
         	return self.input_matrix
-
