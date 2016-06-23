@@ -11,9 +11,11 @@ def denormalize(signal,amp):
 
 def chunkIt(signal,rate):
     chunks=[]
-    length=len(signal)/rate
-    chunks.append(signal[:rate])
+    length=signal[0].shape[1]/rate
+    temp=signal[0]
+    chunks.append(temp[:rate])
     for i in range(1,length):
-        chunks.append(signal[i*rate:(i+1)*rate])
+        t=temp[0][i*rate:(i+1)*rate]
+        chunks.append(t.reshape(1,len(t),1))
 
     return chunks

@@ -11,6 +11,7 @@ from monoPipeline import MyAudio
 import gzip
 from styleModel import *
 import pdb
+from normalize import *
 
 def prepareAudio(directory, size=1):
     oggs = []
@@ -169,7 +170,7 @@ if __name__ == '__main__':
         wav1, r = sf.read(sys.argv[2])
         wav2, r = sf.read(sys.argv[3])
         styleSignal.append(wav1.reshape((1,len(wav1),1)))
-        styleSignal.append(wav2.reshape((1,len(wav2),1)))
+        #styleSignal.append(wav2.reshape((1,len(wav2),1)))
         # wav3,r=sf.read("../input/politique.wav")
         wav3,r = sf.read(sys.argv[4])
         contentSignal=wav3.reshape((1,len(wav3),1))
@@ -219,12 +220,14 @@ if __name__ == '__main__':
         print 'annotValid ', annotValid.shape
         print 'sigValid ', sigValid.shape
         batch = 100
-        m = kModel(sigArray, downRate, annotArray, sigValid[:batch], annotValid[:batch], validRate)
-        start(m, downRate[0], np.hstack((sigArray[:1], sigArray[2:3])), [sigArray[326:327], sigArray[327:328]])
+        m = kModel(normalize(sigArray)[0],downRate,annotArray, normalize(sigValid[:batch])[0], annotValid[:batch], validRate)
+        m.buildAutoEncoder(True,None,annotArray)
+	#start(m, downRate[0], np.hstack((sigArray[:1], sigArray[2:3])), [sigArray[326:327], sigArray[327:328]])
     else:
         print "init"
         m = kModel()
-        start(m, r, contentSignal, chunkIt(styleSignal,r)[0])
+        pdb.set_trace()
+        start(m, r, contentSignal[:20*r], chunkIt(styleSignal,r))
 
     # print 'initiated'
 #    pdb.set_trace()
