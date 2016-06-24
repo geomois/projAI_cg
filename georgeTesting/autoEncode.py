@@ -209,6 +209,7 @@ if __name__ == '__main__':
     print 'sigValid ', sigValid.shape
     batch=100
     
+
     m = kerasModel(sigArray,annotArray,sigValid,annotValid)    
     """
     m.buildAutoEncoder(32,2,'mean_squared_error','adadelta','relu')
@@ -217,10 +218,6 @@ if __name__ == '__main__':
     """
     m.buildAutoEncoder(32,2,'mean_squared_error','adadelta','tanh')
     m.autoEncoderTrain(annotArray,10,128,'ae_weights_tanh.w')
-    """
-    """
-    m.buildAutoEncoder(32,100,'mean_squared_error','adadelta','relu')
-    m.autoEncoderTrain(annotArray,25,128,'ae_weights_len100.w')
     """
     """
     from keras.layers.advanced_activations import LeakyReLU, PReLU
@@ -242,13 +239,36 @@ if __name__ == '__main__':
     m.autoEncoderTrain(annotArray,20,128,'weights32_2_bce_adadelta_relu.w')
     #m.loadWeights('weights32_2_bce_adadelta_relu.w')
     m.evaluate() #gives 50% accuracy
+    """     
     """
-    #from normalize import normalize
-    #sigArray=normalize(sigArray)[0]
-    #annotArray=normalize(annotArray)[0]
-    #sigValid=normalize(sigValid)[0]
-    #annotValid=normalize(annotValid)[0]
-    #m = kerasModel(sigArray,annotArray,sigValid,annotValid)    
     m.buildAutoEncoder(32,128,optim_f='SGD')
     m.autoEncoderTrain(annotArray,20,128,'weights32_128_bce_sgd_relu.w')
+    m.loadWeights('weights32_128_bce_sgd_relu.w')
     m.evaluate() #gives 50%(49) accuracy
+    """
+    #autoencoder 
+#    m.buildAutoEncoder(32,64,loss_f='mse',optim_f='SGD',f='relu')
+#    m.autoEncoderTrain(epochs=20,batch=64,name='AE_weights_32_64_SGD.w')
+
+    """    
+    #classifier
+    m.buildAutoEncoder(32,128,optim_f='SGD')#kalesa to neo architecture
+    #m.autoEncoderTrain(annotArray,20,128,'weights_new.w')
+    m.loadWeights('weights_new.w')
+    m.evaluate()#gives 50(49%)
+    m.encode()
+    """
+    """
+    m.buildAutoEncoder(32,128,optim_f='SGD')#kalesa to akomi pio neo architecture
+    #m.autoEncoderTrain(annotArray,20,128,'weights_new_new.w')
+    m.loadWeights('weights_new_new.w')
+    m.evaluate()#gives 50(49%)
+    m.encode()
+    """
+    """
+    m.buildAutoEncoder(64,2,optim_f='rmsprop') #palio
+    #m.autoEncoderTrain(annotArray,20,128,'weights64_2_bce_adadelta_relu.w')
+    m.loadWeights('weights64_2_bce_adadelta_relu.w')
+    m.evaluate() #gives 48% accuracy
+    m.encode() 
+    """
